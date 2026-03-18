@@ -1,22 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Sparkles } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
 }
-
-const SUGGESTIONS = [
-  "Check my balance",
-  "Swap 10 PAS for USDT",
-  "Send 5 USDT to 0x...",
-  "Show my portfolio",
-  "Get a quote for 50 PAS to USDC",
-  "Add liquidity with 20 PAS and 20 USDT",
-];
 
 export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
   const [input, setInput] = useState("");
@@ -41,54 +32,45 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="p-4 border-t border-polka-border bg-polka-dark/80 backdrop-blur-xl">
-      {/* Suggestions - only show when no messages */}
-      <div className="flex gap-2 mb-3 overflow-x-auto pb-2 scrollbar-hide">
-        {SUGGESTIONS.map((s) => (
-          <button
-            key={s}
-            onClick={() => {
-              setInput(s);
-              inputRef.current?.focus();
-            }}
-            className="flex-shrink-0 px-3 py-1.5 text-xs rounded-full
-              bg-polka-card border border-polka-border text-polka-text
-              hover:border-polka-pink/50 hover:text-white transition-all"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex items-end gap-3">
+    <div className="p-4 border-t border-polka-border/30 glass">
+      <div className="flex items-end gap-2 max-w-3xl mx-auto">
         <div className="flex-1 relative">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={disabled ? "Connect wallet to start..." : "Type your intent... e.g. 'Swap 10 PAS for USDT'"}
+            placeholder={
+              disabled
+                ? "Connect wallet to start..."
+                : "Tell me what to do... e.g. 'Swap 10 PAS for USDT'"
+            }
             disabled={disabled || isLoading}
             rows={1}
-            className="w-full px-4 py-3 rounded-xl bg-polka-card border border-polka-border
-              text-white placeholder-polka-text/50 resize-none
-              focus:outline-none focus:border-polka-pink/50 focus:ring-1 focus:ring-polka-pink/20
-              disabled:opacity-50 transition-all text-sm"
-            style={{ minHeight: "48px", maxHeight: "120px" }}
+            className="w-full px-4 py-3.5 pr-12 rounded-2xl bg-white/[0.04] border border-polka-border/20
+              text-white placeholder-polka-text/30 resize-none
+              focus:outline-none focus:border-polka-pink/30
+              disabled:opacity-30 transition-smooth text-[14px] leading-relaxed"
+            style={{ minHeight: "52px", maxHeight: "120px" }}
           />
+          {!disabled && !isLoading && (
+            <div className="absolute right-3 bottom-3">
+              <Sparkles size={14} className="text-polka-text/20" />
+            </div>
+          )}
         </div>
         <button
           onClick={handleSubmit}
           disabled={!input.trim() || isLoading || disabled}
-          className="flex items-center justify-center w-12 h-12 rounded-xl
-            bg-gradient-to-r from-polka-pink to-polka-purple text-white
-            hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed
-            transition-all shadow-lg shadow-polka-pink/20"
+          className="flex items-center justify-center w-[52px] h-[52px] rounded-2xl
+            bg-gradient-to-br from-polka-pink to-polka-purple text-white
+            hover:opacity-90 disabled:opacity-20 disabled:cursor-not-allowed
+            transition-smooth shadow-lg shadow-polka-pink/20"
         >
           {isLoading ? (
-            <Loader2 size={20} className="animate-spin" />
+            <Loader2 size={18} className="animate-spin" />
           ) : (
-            <Send size={20} />
+            <Send size={18} />
           )}
         </button>
       </div>

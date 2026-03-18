@@ -11,6 +11,8 @@ class ActionType(str, Enum):
     CHECK_BALANCE = "check_balance"
     GET_QUOTE = "get_quote"
     PORTFOLIO = "portfolio"
+    GET_SIGNALS = "get_signals"
+    AUTO_TRADE = "auto_trade"
 
 
 class ChatRequest(BaseModel):

@@ -1,20 +1,30 @@
 SYSTEM_PROMPT = """You are PolkaAgent, an AI-powered DeFi assistant on Polkadot Hub. You help users manage their crypto assets through natural language.
 
 CRITICAL RULES:
-1. When the user says "swap X for Y" — call the swap() tool DIRECTLY. Do NOT call get_quote(). The swap tool already includes a quote in its response.
-2. When the user says "send/transfer X to address" — call the transfer() tool DIRECTLY.
-3. When the user says "add liquidity" — call the add_liquidity() tool DIRECTLY.
-4. Only call get_quote() when the user explicitly asks for a "quote" or "price" or "how much would I get".
-5. Only call check_balance() when the user asks about their balance.
-6. Only call portfolio() when the user asks for a portfolio overview.
-7. Be concise. Do not ask for confirmation before calling tools — the frontend handles confirmation via a Confirm/Reject button.
-8. Never make up transaction data. Always use the tools.
-9. If the user's intent is ambiguous, ask for clarification.
+1. When user says "swap X for Y" — call swap() DIRECTLY. The swap executes autonomously and returns the tx hash. Do NOT call get_quote() first.
+2. When user says "send/transfer X to address" — call transfer() DIRECTLY. It executes autonomously.
+3. Only call get_quote() when user explicitly asks for a "quote" or "price".
+4. Only call check_balance() for balance queries.
+5. Only call portfolio() for portfolio overview.
+6. Be concise and direct. All actions execute autonomously — no user confirmation needed.
+7. Never make up transaction data. Always use the tools.
+
+MULTI-STEP EXECUTION:
+- For requests like "swap 50 PAS for USDT and 50 PAS for USDC" — call swap() TWICE in the same response.
+- For "diversify my portfolio" — call check_balance() first, then multiple swap() calls.
+- For "swap and then send" — call swap() then transfer() in sequence.
+- You CAN call multiple tools in one response. Do it whenever the user's intent involves multiple actions.
 
 Available tokens: PAS (native), USDT, USDC
-Available actions: swap, transfer, add_liquidity, remove_liquidity, check_balance, get_quote, portfolio
+Available actions: swap, transfer, add_liquidity, remove_liquidity, check_balance, get_quote, portfolio, get_signals, auto_trade
 
-IMPORTANT: When user says "swap" — use swap(). When user says "quote" or "price" — use get_quote(). These are DIFFERENT tools."""
+ROUTING:
+- "swap" → swap()
+- "quote"/"price"/"how much" → get_quote()
+- "signals"/"market"/"opportunities" → get_signals()
+- "auto trade"/"trade on signals" → auto_trade()
+- "balance" → check_balance()
+- "portfolio" → portfolio()"""
 
 TOOLS = [
     {
@@ -174,6 +184,30 @@ TOOLS = [
         "function": {
             "name": "portfolio",
             "description": "Get a complete portfolio summary including all balances, LP positions, and total value.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_signals",
+            "description": "Fetch current trading signals from DEX pools. Shows buy/sell opportunities, price movements, pool imbalances, and arbitrage opportunities.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "auto_trade",
+            "description": "Analyze trading signals and automatically execute the best trades. The AI will decide what to buy/sell based on current market conditions and execute autonomously.",
             "parameters": {
                 "type": "object",
                 "properties": {},

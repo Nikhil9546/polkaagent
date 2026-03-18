@@ -13,6 +13,7 @@ from ..chain.reader import (
 )
 from ..chain.tx_builder import build_transaction
 from ..chain.executor import execute_swap_autonomous, execute_transfer_autonomous
+from ..chain.signals import get_all_prices, generate_signals
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -76,6 +77,47 @@ def execute_tool(action: str, params: dict, wallet_address: str) -> dict:
 
         elif action in ("add_liquidity", "remove_liquidity"):
             return {"error": f"{action} autonomous execution coming soon"}
+
+        elif action == "get_signals":
+            prices = get_all_prices()
+            signals = generate_signals()
+            return {
+                "prices": prices,
+                "signals": signals,
+                "total_signals": len(signals),
+            }
+
+        elif action == "auto_trade":
+            # Get signals and portfolio, then execute best trades
+            signals = generate_signals()
+            prices = get_all_prices()
+            agent_wallet = get_agent_wallet_address(wallet_address)
+            balances = get_agent_wallet_balances(agent_wallet) if agent_wallet else get_all_balances(wallet_address)
+
+            executed = []
+            buy_signals = [s for s in signals if s["signal_type"] == "BUY" and s["strength"] in ("STRONG", "MODERATE")]
+
+            for signal in buy_signals[:2]:  # max 2 trades per auto-trade
+                token = signal["token"]
+                # Trade 10% of PAS balance
+                pas_bal = float(balances.get("PAS", "0"))
+                trade_amount = str(round(pas_bal * 0.1, 2))
+                if float(trade_amount) > 1:
+                    result = execute_swap_autonomous(wallet_address, "PAS", token, trade_amount)
+                    executed.append({
+                        "signal": signal,
+                        "trade": {"from": "PAS", "to": token, "amount": trade_amount},
+                        "result": result,
+                    })
+
+            return {
+                "signals": signals,
+                "prices": prices,
+                "portfolio": balances,
+                "executed_trades": executed,
+                "total_signals": len(signals),
+                "trades_executed": len(executed),
+            }
 
         else:
             return {"error": f"Unknown action: {action}"}
