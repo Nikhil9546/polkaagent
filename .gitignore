@@ -1,2 +1,30 @@
-# Ignore markdown files
-*.md
+# Dependencies
+node_modules/
+backend/venv/
+
+# Build outputs
+frontend/.next/
+frontend/out/
+contracts/out/
+contracts/cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Foundry
+contracts/broadcast/

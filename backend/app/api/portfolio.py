@@ -56,6 +56,7 @@ async def get_portfolio(wallet_address: str):
             native_balance=wallet_balances.get("PAS", "0"),
             token_balances=token_balances,
             lp_positions=lp_positions,
+            agent_wallet_address=agent_wallet,
         )
     except Exception as e:
         logger.error(f"Portfolio error: {e}", exc_info=True)

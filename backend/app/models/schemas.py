@@ -78,11 +78,17 @@ class ExecuteResponse(BaseModel):
     total_gas: str
 
 
+class TokenBalance(BaseModel):
+    wallet: str = "0"
+    agent_wallet: str = "0"
+
+
 class PortfolioResponse(BaseModel):
     native_balance: str
-    token_balances: dict[str, str]
+    token_balances: dict[str, TokenBalance]
     lp_positions: list[dict] = []
     total_value_usd: str = "0"
+    agent_wallet_address: Optional[str] = None
 
 
 class QuoteResponse(BaseModel):

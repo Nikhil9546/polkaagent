@@ -12,6 +12,7 @@ from ..chain.reader import (
     get_pool_info,
 )
 from ..chain.tx_builder import build_transaction
+from ..chain.executor import execute_swap_autonomous, execute_transfer_autonomous
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -52,27 +53,29 @@ def execute_tool(action: str, params: dict, wallet_address: str) -> dict:
                 params["from_token"], params["to_token"], params["amount"]
             )
 
-        elif action in ("transfer", "swap", "add_liquidity", "remove_liquidity"):
-            # For state-changing actions, build the transaction
-            agent_wallet = get_agent_wallet_address(wallet_address)
-            target_wallet = agent_wallet or wallet_address
+        elif action == "swap":
+            # Autonomous swap — AI signs and broadcasts via Agent Wallet
+            result = execute_swap_autonomous(
+                wallet_address,
+                params["from_token"],
+                params["to_token"],
+                params["amount"],
+                params.get("slippage", "0.5"),
+            )
+            return result
 
-            tx = build_transaction(target_wallet, action, params)
-            if "error" in tx:
-                return {"error": tx["error"]}
+        elif action == "transfer":
+            # Autonomous transfer via Agent Wallet
+            result = execute_transfer_autonomous(
+                wallet_address,
+                params["token"],
+                params["to"],
+                params["amount"],
+            )
+            return result
 
-            return {
-                "action": action,
-                "params": params,
-                "transaction": {
-                    "to": tx["to"],
-                    "data": tx["data"],
-                    "value": tx["value"],
-                    "gas_estimate": tx["gas_estimate"],
-                },
-                "description": tx["description"],
-                "requires_confirmation": True,
-            }
+        elif action in ("add_liquidity", "remove_liquidity"):
+            return {"error": f"{action} autonomous execution coming soon"}
 
         else:
             return {"error": f"Unknown action: {action}"}
