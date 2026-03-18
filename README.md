@@ -1,7 +1,5 @@
 # PolkaAgent — Autonomous AI DeFi Agent on Polkadot Hub
 
-> **Polkadot Solidity Hackathon 2026 | Track 1: AI-Powered DeFi**
-
 PolkaAgent is an autonomous AI agent that monitors DEX trading signals, analyzes market conditions using DeepSeek AI, and executes trades on Polkadot Hub — all without manual user intervention. Secured by on-chain smart contract guardrails with daily spending limits, contract allowlists, and emergency controls.
 
 ---
@@ -361,12 +359,6 @@ On-chain safety:
 - [ ] External price feed integration (oracles)
 - [ ] Gas relayer (users don't need to fund agent)
 - [ ] Agent marketplace — share and copy strategies
-
----
-
-## Team
-
-Built for the Polkadot Solidity Hackathon 2026.
 
 ---
 
