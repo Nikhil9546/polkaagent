@@ -95,9 +95,17 @@ async def get_pool(token: str):
 @router.get("/wallet/{user_address}")
 async def get_wallet_info(user_address: str):
     """Get agent wallet info for a user."""
-    agent_wallet = get_agent_wallet_address(user_address)
-    return {
-        "user_address": user_address,
-        "agent_wallet": agent_wallet,
-        "has_wallet": agent_wallet is not None,
-    }
+    try:
+        agent_wallet = get_agent_wallet_address(user_address)
+        return {
+            "user_address": user_address,
+            "agent_wallet": agent_wallet,
+            "has_wallet": agent_wallet is not None,
+        }
+    except Exception as e:
+        logger.error(f"Wallet info error: {e}", exc_info=True)
+        return {
+            "user_address": user_address,
+            "agent_wallet": None,
+            "has_wallet": False,
+        }

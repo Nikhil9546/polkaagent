@@ -65,15 +65,19 @@ def get_all_balances(wallet_address: str) -> dict:
 
 def get_agent_wallet_address(user_address: str) -> str | None:
     """Get the AgentWallet address for a user from the factory."""
-    if not settings.wallet_factory_address:
+    if not settings.wallet_factory_address or settings.wallet_factory_address == "0x":
         return None
-    factory = get_contract(settings.wallet_factory_address, WALLET_FACTORY_ABI)
-    wallet_addr = factory.functions.getWallet(
-        Web3.to_checksum_address(user_address)
-    ).call()
-    if wallet_addr == "0x0000000000000000000000000000000000000000":
+    try:
+        factory = get_contract(settings.wallet_factory_address, WALLET_FACTORY_ABI)
+        wallet_addr = factory.functions.getWallet(
+            Web3.to_checksum_address(user_address)
+        ).call()
+        if wallet_addr == "0x0000000000000000000000000000000000000000":
+            return None
+        return wallet_addr
+    except Exception as e:
+        logger.error(f"Failed to get agent wallet: {e}")
         return None
-    return wallet_addr
 
 
 def get_agent_wallet_balances(wallet_address: str) -> dict:

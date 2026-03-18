@@ -1,15 +1,19 @@
 import json
-import os
+import logging
 from pathlib import Path
-from web3 import Web3, AsyncWeb3
+from web3 import Web3
 from web3.middleware import ExtraDataToPOAMiddleware
 from ..config import get_settings
 
+logger = logging.getLogger(__name__)
 settings = get_settings()
 
 # Synchronous client
 w3 = Web3(Web3.HTTPProvider(settings.rpc_url))
-w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+try:
+    w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
+except Exception:
+    pass
 
 # Load ABIs from compiled contracts
 CONTRACTS_DIR = Path(__file__).parent.parent.parent.parent / "contracts" / "out"
@@ -17,10 +21,13 @@ CONTRACTS_DIR = Path(__file__).parent.parent.parent.parent / "contracts" / "out"
 
 def load_abi(contract_name: str) -> list:
     abi_path = CONTRACTS_DIR / f"{contract_name}.sol" / f"{contract_name}.json"
-    if abi_path.exists():
-        with open(abi_path) as f:
-            artifact = json.load(f)
-            return artifact["abi"]
+    try:
+        if abi_path.exists():
+            with open(abi_path) as f:
+                artifact = json.load(f)
+                return artifact["abi"]
+    except Exception as e:
+        logger.warning(f"Could not load ABI for {contract_name}: {e}")
     return []
 
 
