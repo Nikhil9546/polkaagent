@@ -15,8 +15,25 @@ try:
 except Exception:
     pass
 
-# Load ABIs from compiled contracts
-CONTRACTS_DIR = Path(__file__).parent.parent.parent.parent / "contracts" / "out"
+# Load ABIs from compiled contracts — try multiple paths for local + Railway
+_POSSIBLE_ROOTS = [
+    Path(__file__).parent.parent.parent.parent / "contracts" / "out",  # local dev
+    Path(__file__).parent.parent.parent.parent.parent / "contracts" / "out",  # Railway (root=backend)
+    Path("/app") / "contracts" / "out",  # Railway absolute
+    Path.cwd().parent / "contracts" / "out",  # relative to cwd
+    Path.cwd() / ".." / "contracts" / "out",
+]
+
+CONTRACTS_DIR = None
+for _p in _POSSIBLE_ROOTS:
+    if _p.exists():
+        CONTRACTS_DIR = _p
+        logger.info(f"Found contracts at: {_p}")
+        break
+
+if not CONTRACTS_DIR:
+    logger.warning(f"contracts/out not found in any of: {[str(p) for p in _POSSIBLE_ROOTS]}")
+    CONTRACTS_DIR = _POSSIBLE_ROOTS[0]  # fallback
 
 
 def load_abi(contract_name: str) -> list:
