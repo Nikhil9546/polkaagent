@@ -5,7 +5,6 @@ backend/venv/
 # Build outputs
 frontend/.next/
 frontend/out/
-contracts/out/
 contracts/cache/
 
 # Environment
