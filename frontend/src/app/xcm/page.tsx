@@ -34,12 +34,12 @@ interface Opportunity {
 }
 
 const CHAIN_COLORS: Record<string, string> = {
-  "Polkadot Hub": "from-polka-pink to-polka-purple",
-  "Hydration": "from-blue-500 to-cyan-500",
-  "Moonbeam": "from-purple-500 to-indigo-500",
-  "Acala": "from-red-500 to-orange-500",
-  "Astar": "from-blue-600 to-violet-500",
-  "Bifrost": "from-green-500 to-emerald-500",
+  "Polkadot Hub": "border-polka-pink/15 bg-polka-pink/[0.05] text-polka-pink",
+  "Hydration": "border-cyan-500/15 bg-cyan-500/[0.05] text-cyan-400",
+  "Moonbeam": "border-purple-500/15 bg-purple-500/[0.05] text-purple-400",
+  "Acala": "border-red-500/15 bg-red-500/[0.05] text-red-400",
+  "Astar": "border-blue-500/15 bg-blue-500/[0.05] text-blue-400",
+  "Bifrost": "border-green-500/15 bg-green-500/[0.05] text-green-400",
 };
 
 const CHAIN_BORDER_COLORS: Record<string, string> = {
@@ -175,7 +175,7 @@ export default function XCMPage() {
 
                   {/* Route visualization */}
                   <div className="flex items-center gap-2 mb-3">
-                    <div className={`px-3 py-1.5 rounded-lg bg-gradient-to-r ${CHAIN_COLORS[opp.buy_chain] || "from-gray-500 to-gray-600"} text-white text-[11px] font-medium`}>
+                    <div className={`px-3 py-1.5 rounded-md border ${CHAIN_COLORS[opp.buy_chain] || "border-polka-border bg-polka-darker text-polka-text"} text-[11px] font-medium font-mono`}>
                       {opp.buy_chain}
                     </div>
                     <div className="flex items-center gap-1 text-polka-text/40">
@@ -185,7 +185,7 @@ export default function XCMPage() {
                       <ArrowRightLeft size={12} />
                       <span className="font-mono text-[9px] tracking-wider">Sell @ ${opp.sell_price.toFixed(4)}</span>
                     </div>
-                    <div className={`px-3 py-1.5 rounded-lg bg-gradient-to-r ${CHAIN_COLORS[opp.sell_chain] || "from-gray-500 to-gray-600"} text-white text-[11px] font-medium`}>
+                    <div className={`px-3 py-1.5 rounded-md border ${CHAIN_COLORS[opp.sell_chain] || "border-polka-border bg-polka-darker text-polka-text"} text-[11px] font-medium font-mono`}>
                       {opp.sell_chain}
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export default function XCMPage() {
             {Object.entries(prices).map(([chain, info]: [string, any]) => (
               <div key={chain} className="p-5 rounded-xl tech-card corner-accents">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${CHAIN_COLORS[chain] || "from-gray-500 to-gray-600"} flex items-center justify-center text-white text-[10px] font-bold`}>
+                  <div className={`w-8 h-8 rounded-md border ${CHAIN_COLORS[chain] || "border-polka-border bg-polka-darker text-polka-text"} flex items-center justify-center text-[10px] font-bold font-mono`}>
                     {chain[0]}
                   </div>
                   <div>
