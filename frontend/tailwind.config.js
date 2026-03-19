@@ -7,23 +7,26 @@ module.exports = {
         polka: {
           pink: "#E6007A",
           purple: "#6D3AEE",
-          dark: "#0a0a12",
-          card: "#12121e",
-          border: "#1e1e30",
-          text: "#8b8a9e",
+          dark: "#080b12",
+          darker: "#060810",
+          card: "#0c0f18",
+          border: "#141828",
+          text: "#5a5f7a",
+          muted: "#2a2e42",
           light: "#F5F3FF",
         },
       },
       fontFamily: {
-        sans: ["'Space Grotesk'", "'Inter'", "system-ui", "sans-serif"],
+        display: ["'Rajdhani'", "'Share Tech Mono'", "sans-serif"],
+        sans: ["'Inter'", "system-ui", "sans-serif"],
         body: ["'Inter'", "system-ui", "sans-serif"],
-        mono: ["'JetBrains Mono'", "monospace"],
+        mono: ["'Share Tech Mono'", "'JetBrains Mono'", "monospace"],
       },
       animation: {
         "pulse-slow": "pulse 3s ease-in-out infinite",
         gradient: "gradient 8s ease infinite",
         float: "float 6s ease-in-out infinite",
-        "in": "fadeIn 0.3s ease-out",
+        in: "fadeIn 0.3s ease-out",
       },
       keyframes: {
         gradient: {

@@ -25,36 +25,36 @@ export function ConnectButton() {
     return (
       <button
         onClick={() => connect({ connector: injected() })}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm
-          bg-gradient-to-r from-polka-pink to-polka-purple text-white
-          hover:opacity-90 transition-all duration-200 shadow-lg shadow-polka-pink/20"
+        className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-mono text-[11px] font-semibold uppercase tracking-wider
+          border border-polka-pink/20 bg-polka-pink/10 text-polka-pink
+          hover:bg-polka-pink/15 transition-all duration-200"
       >
-        <Wallet size={18} />
+        <Wallet size={14} />
         Connect Wallet
       </button>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-polka-card border border-polka-border">
-        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-        <span className="text-sm text-polka-text font-mono">
+    <div className="flex items-center gap-2">
+      <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-polka-border bg-polka-card">
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot" />
+        <span className="font-mono text-[10px] text-polka-text tracking-wider">
           {formatBalance(balance?.formatted || "0")} PAS
         </span>
       </div>
-      <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-polka-card border border-polka-border">
-        <button onClick={copyAddress} className="flex items-center gap-2 hover:text-white transition-colors text-polka-text">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-polka-pink to-polka-purple" />
-          <span className="text-sm font-mono">{shortenAddress(address!)}</span>
-          {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+      <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-polka-border bg-polka-card">
+        <button onClick={copyAddress} className="flex items-center gap-2 hover:text-polka-pink transition-colors text-polka-text">
+          <div className="w-5 h-5 rounded-md border border-polka-pink/15 bg-polka-pink/[0.05]" />
+          <span className="font-mono text-[10px] tracking-wider">{shortenAddress(address!)}</span>
+          {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
         </button>
         <button
           onClick={() => disconnect()}
-          className="ml-2 p-1 rounded-lg hover:bg-red-500/20 text-polka-text hover:text-red-400 transition-all"
+          className="ml-1.5 p-1 rounded-md hover:bg-red-500/10 text-polka-text hover:text-red-400 transition-all"
           title="Disconnect"
         >
-          <LogOut size={16} />
+          <LogOut size={13} />
         </button>
       </div>
     </div>

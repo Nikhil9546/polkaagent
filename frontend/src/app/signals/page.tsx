@@ -37,23 +37,23 @@ interface TradeResult {
 }
 
 const SIGNAL_ICONS: Record<string, React.ReactNode> = {
-  BUY: <TrendingUp size={16} />,
-  SELL: <TrendingDown size={16} />,
-  HOLD: <Clock size={16} />,
-  ALERT: <AlertTriangle size={16} />,
+  BUY: <TrendingUp size={14} />,
+  SELL: <TrendingDown size={14} />,
+  HOLD: <Clock size={14} />,
+  ALERT: <AlertTriangle size={14} />,
 };
 
 const SIGNAL_COLORS: Record<string, string> = {
-  BUY: "text-green-400 bg-green-500/10 border-green-500/20",
-  SELL: "text-red-400 bg-red-500/10 border-red-500/20",
-  HOLD: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
-  ALERT: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+  BUY: "text-emerald-400 bg-emerald-500/[0.03] border-emerald-500/10",
+  SELL: "text-red-400 bg-red-500/[0.03] border-red-500/10",
+  HOLD: "text-yellow-400 bg-yellow-500/[0.03] border-yellow-500/10",
+  ALERT: "text-orange-400 bg-orange-500/[0.03] border-orange-500/10",
 };
 
 const STRENGTH_DOTS: Record<string, string> = {
-  STRONG: "bg-green-400",
+  STRONG: "bg-emerald-400",
   MODERATE: "bg-yellow-400",
-  WEAK: "bg-gray-400",
+  WEAK: "bg-polka-text/30",
 };
 
 export default function SignalsPage() {
@@ -94,7 +94,6 @@ export default function SignalsPage() {
       if (res.ok) {
         const data = await res.json();
         setTradeResults(data.executed_trades || []);
-        // Refresh signals after trading
         fetchSignals();
       }
     } catch (err) {
@@ -111,46 +110,46 @@ export default function SignalsPage() {
   if (!mounted) return <div className="min-h-screen bg-polka-dark" />;
 
   return (
-    <div className="min-h-screen bg-polka-dark">
+    <div className="min-h-screen bg-polka-dark grid-bg scanlines">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-3 border-b border-polka-border glass sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <Link href="/" className="p-2 rounded-lg hover:bg-polka-card text-polka-text hover:text-white transition-all">
-            <ArrowLeft size={20} />
+          <Link href="/" className="p-2 rounded-lg hover:bg-polka-pink/[0.03] text-polka-text hover:text-polka-pink transition-all">
+            <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-white">Trading Signals</h1>
-            <p className="text-[10px] text-polka-text">AI-powered market analysis</p>
+            <h1 className="font-display text-lg font-bold text-white tracking-wide">Trading Signals</h1>
+            <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-[0.2em]">AI-Powered Market Analysis</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={fetchSignals}
             disabled={isLoading}
-            className="p-2 rounded-lg hover:bg-polka-card text-polka-text hover:text-white transition-all"
+            className="p-2 rounded-lg hover:bg-polka-pink/[0.03] text-polka-text hover:text-polka-pink transition-all"
           >
-            <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
+            <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
           </button>
           <ConnectButton />
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
         {/* Prices */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {Object.entries(prices).map(([token, data]: [string, any]) => (
-            <div key={token} className="p-5 rounded-2xl bg-polka-card border border-polka-border">
+            <div key={token} className="p-5 rounded-xl tech-card corner-accents">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm text-polka-text">PAS / {token}</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-polka-dark text-polka-text">DEX</span>
+                <span className="font-mono text-[9px] text-polka-text/40 uppercase tracking-[0.2em]">PAS / {token}</span>
+                <span className="font-mono text-[8px] px-2 py-0.5 rounded-md border border-polka-border bg-polka-darker text-polka-text/40 uppercase tracking-wider">DEX</span>
               </div>
-              <p className="text-2xl font-bold text-white font-mono">
+              <p className="num-display text-3xl text-white">
                 {parseFloat(data.price_in_pas).toFixed(4)}
               </p>
-              <p className="text-xs text-polka-text mt-1">
+              <p className="font-mono text-[10px] text-polka-text/40 mt-1 tracking-wider">
                 ${parseFloat(data.price_in_usd).toFixed(4)} USD
               </p>
-              <div className="flex gap-4 mt-3 text-[10px] text-polka-text">
+              <div className="flex gap-4 mt-3 font-mono text-[9px] text-polka-text/30 tracking-wider">
                 <span>PAS: {parseFloat(data.reserve_pas).toFixed(1)}</span>
                 <span>{token}: {parseFloat(data.reserve_token).toFixed(1)}</span>
               </div>
@@ -163,18 +162,18 @@ export default function SignalsPage() {
           <button
             onClick={executeAutoTrade}
             disabled={isTrading || signals.length === 0}
-            className="w-full py-4 rounded-xl bg-gradient-to-r from-polka-pink to-polka-purple text-white font-bold text-lg
-              disabled:opacity-30 hover:opacity-90 transition-all shadow-lg shadow-polka-pink/20
+            className="w-full py-4 rounded-xl border border-polka-pink/20 bg-polka-pink/10 text-polka-pink font-mono text-sm font-semibold uppercase tracking-wider
+              disabled:opacity-20 hover:bg-polka-pink/15 transition-all
               flex items-center justify-center gap-3"
           >
             {isTrading ? (
               <>
-                <Loader2 size={22} className="animate-spin" />
+                <Loader2 size={18} className="animate-spin" />
                 AI is executing trades...
               </>
             ) : (
               <>
-                <Bot size={22} />
+                <Bot size={18} />
                 Auto-Trade Based on Signals
               </>
             )}
@@ -183,21 +182,21 @@ export default function SignalsPage() {
 
         {/* Trade Results */}
         {tradeResults.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-polka-text uppercase tracking-wider flex items-center gap-2">
-              <Check size={14} className="text-green-400" />
+          <div className="space-y-2">
+            <h3 className="tech-label text-polka-text/50 flex items-center gap-2">
+              <Check size={12} className="text-emerald-400" />
               Executed Trades
             </h3>
             {tradeResults.map((tr, i) => (
-              <div key={i} className="p-4 rounded-xl bg-green-500/5 border border-green-500/20">
+              <div key={i} className="p-4 rounded-xl border border-emerald-500/10 bg-emerald-500/[0.02]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <ArrowRightLeft size={14} className="text-green-400" />
-                    <span className="text-sm text-white">
-                      {tr.trade.amount} {tr.trade.from} → {tr.trade.to}
+                    <ArrowRightLeft size={12} className="text-emerald-400" />
+                    <span className="font-display text-sm text-white tracking-wide">
+                      {tr.trade.amount} {tr.trade.from} &rarr; {tr.trade.to}
                     </span>
                   </div>
-                  <span className={`text-xs ${tr.result.success ? "text-green-400" : "text-red-400"}`}>
+                  <span className={`font-mono text-[9px] uppercase tracking-wider ${tr.result.success ? "text-emerald-400" : "text-red-400"}`}>
                     {tr.result.status}
                   </span>
                 </div>
@@ -206,7 +205,7 @@ export default function SignalsPage() {
                     href={`https://blockscout-testnet.polkadot.io/tx/0x${tr.result.tx_hash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] text-polka-pink hover:underline mt-1 block font-mono"
+                    className="font-mono text-[9px] text-polka-pink/40 hover:text-polka-pink mt-1 block tracking-wider"
                   >
                     {tr.result.tx_hash.slice(0, 16)}...
                   </a>
@@ -217,17 +216,17 @@ export default function SignalsPage() {
         )}
 
         {/* Signals */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-polka-text uppercase tracking-wider flex items-center gap-2">
-            <Zap size={14} />
+        <div className="space-y-2">
+          <h3 className="tech-label text-polka-text/50 flex items-center gap-2">
+            <Zap size={12} />
             Active Signals ({signals.length})
           </h3>
 
           {signals.length === 0 ? (
             <div className="text-center py-12">
-              <TrendingUp size={48} className="mx-auto text-polka-text/20 mb-4" />
-              <p className="text-polka-text">No signals right now. Market is stable.</p>
-              <p className="text-xs text-polka-text/50 mt-2">Signals are generated from DEX pool analysis</p>
+              <TrendingUp size={40} className="mx-auto text-polka-text/10 mb-4" />
+              <p className="font-mono text-polka-text/30 text-[10px] uppercase tracking-wider">No signals right now. Market is stable.</p>
+              <p className="font-mono text-polka-text/15 text-[9px] mt-2 tracking-wider">Signals are generated from DEX pool analysis</p>
             </div>
           ) : (
             signals.map((signal, i) => (
@@ -238,22 +237,22 @@ export default function SignalsPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     {SIGNAL_ICONS[signal.signal_type]}
-                    <span className="font-bold text-sm">{signal.signal_type}</span>
-                    <span className="text-white font-semibold">{signal.token}</span>
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-wider">{signal.signal_type}</span>
+                    <span className="font-display text-white font-semibold tracking-wide">{signal.token}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${STRENGTH_DOTS[signal.strength] || STRENGTH_DOTS.WEAK}`} />
-                    <span className="text-xs text-polka-text">{signal.strength}</span>
+                    <div className={`w-1.5 h-1.5 rounded-full ${STRENGTH_DOTS[signal.strength] || STRENGTH_DOTS.WEAK}`} />
+                    <span className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">{signal.strength}</span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-300 mb-2">{signal.reason}</p>
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-polka-text">
+                <p className="text-[13px] text-polka-text/60 mb-2 leading-relaxed">{signal.reason}</p>
+                <div className="flex items-center justify-between font-mono text-[10px] tracking-wider">
+                  <span className="text-polka-text/40">
                     Price: {parseFloat(signal.current_price).toFixed(4)} PAS
                   </span>
-                  <span className="font-mono">{signal.change_pct}</span>
+                  <span className="text-polka-text/30">{signal.change_pct}</span>
                 </div>
-                <div className="mt-2 p-2 rounded-lg bg-polka-dark/50 text-xs text-polka-text">
+                <div className="mt-2 p-2.5 rounded-lg border border-polka-border bg-polka-darker font-mono text-[10px] text-polka-text/40 tracking-wider">
                   {signal.recommended_action}
                 </div>
               </div>

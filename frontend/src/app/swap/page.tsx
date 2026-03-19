@@ -15,9 +15,9 @@ import { useMounted } from "@/hooks/useMounted";
 import { formatBalance } from "@/lib/utils";
 
 const TOKENS = [
-  { symbol: "PAS", name: "Polkadot Hub", color: "from-polka-pink to-polka-purple", icon: "P" },
-  { symbol: "USDT", name: "Tether USD", color: "from-green-500 to-emerald-500", icon: "$" },
-  { symbol: "USDC", name: "USD Coin", color: "from-blue-500 to-cyan-500", icon: "$" },
+  { symbol: "PAS", name: "Polkadot Hub", color: "border-polka-pink/15 bg-polka-pink/[0.05] text-polka-pink", icon: "P" },
+  { symbol: "USDT", name: "Tether USD", color: "border-emerald-500/15 bg-emerald-500/[0.05] text-emerald-400", icon: "$" },
+  { symbol: "USDC", name: "USD Coin", color: "border-blue-500/15 bg-blue-500/[0.05] text-blue-400", icon: "$" },
 ];
 
 export default function SwapPage() {
@@ -53,7 +53,6 @@ export default function SwapPage() {
         setToAmount(data.amount_out);
       }
     } catch {
-      // Quote failed silently
     } finally {
       setIsQuoting(false);
     }
@@ -72,51 +71,51 @@ export default function SwapPage() {
   if (!mounted) return <div className="min-h-screen bg-polka-dark" />;
 
   return (
-    <div className="min-h-screen bg-polka-dark">
+    <div className="min-h-screen bg-polka-dark grid-bg scanlines">
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-3 border-b border-polka-border glass sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <Link href="/" className="p-2 rounded-lg hover:bg-polka-card text-polka-text hover:text-white transition-all">
-            <ArrowLeft size={20} />
+          <Link href="/" className="p-2 rounded-lg hover:bg-polka-pink/[0.03] text-polka-text hover:text-polka-pink transition-all">
+            <ArrowLeft size={18} />
           </Link>
           <div>
-            <h1 className="text-lg font-bold text-white">Swap</h1>
-            <p className="text-[10px] text-polka-text">Trade tokens on Polkadot Hub</p>
+            <h1 className="font-display text-lg font-bold text-white tracking-wide">Swap</h1>
+            <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-[0.2em]">Trade Tokens on Polkadot Hub</p>
           </div>
         </div>
         <ConnectButton />
       </header>
 
       <div className="max-w-md mx-auto px-4 py-12">
-        <div className="rounded-2xl bg-polka-card border border-polka-border p-6 space-y-4 glow-pink">
+        <div className="rounded-xl tech-card corner-accents p-6 space-y-4 glow-pink">
           {/* From */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-polka-text">
+            <div className="flex justify-between font-mono text-[9px] text-polka-text/40 uppercase tracking-wider">
               <span>You pay</span>
               <span>Balance: --</span>
             </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-polka-dark border border-polka-border">
-              <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${fromMeta.color} flex items-center justify-center text-white font-bold`}>
+            <div className="flex items-center gap-3 p-4 rounded-lg border border-polka-border bg-polka-darker">
+              <div className={`w-10 h-10 rounded-md border ${fromMeta.color} flex items-center justify-center font-mono font-bold`}>
                 {fromMeta.icon}
               </div>
               <div className="flex-1">
                 <select
                   value={fromToken}
                   onChange={(e) => setFromToken(e.target.value)}
-                  className="bg-transparent text-white font-semibold text-lg outline-none cursor-pointer"
+                  className="bg-transparent font-display text-white font-semibold text-lg tracking-wide outline-none cursor-pointer"
                 >
                   {TOKENS.filter((t) => t.symbol !== toToken).map((t) => (
                     <option key={t.symbol} value={t.symbol} className="bg-polka-dark">{t.symbol}</option>
                   ))}
                 </select>
-                <p className="text-xs text-polka-text">{fromMeta.name}</p>
+                <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">{fromMeta.name}</p>
               </div>
               <input
                 type="number"
                 value={fromAmount}
                 onChange={(e) => handleFromAmountChange(e.target.value)}
                 placeholder="0.0"
-                className="w-32 text-right bg-transparent text-white text-2xl font-mono outline-none placeholder-polka-text/30"
+                className="w-32 text-right bg-transparent text-white text-2xl font-mono outline-none placeholder-polka-text/20"
               />
             </div>
           </div>
@@ -125,41 +124,41 @@ export default function SwapPage() {
           <div className="flex justify-center -my-1">
             <button
               onClick={switchTokens}
-              className="p-3 rounded-xl bg-polka-dark border border-polka-border hover:border-polka-pink/50 text-polka-text hover:text-polka-pink transition-all hover:rotate-180 duration-300"
+              className="p-3 rounded-lg border border-polka-border bg-polka-darker hover:border-polka-pink/20 text-polka-text hover:text-polka-pink transition-all hover:rotate-180 duration-300"
             >
-              <ArrowDownUp size={18} />
+              <ArrowDownUp size={16} />
             </button>
           </div>
 
           {/* To */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-polka-text">
+            <div className="flex justify-between font-mono text-[9px] text-polka-text/40 uppercase tracking-wider">
               <span>You receive</span>
               <span>Balance: --</span>
             </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-polka-dark border border-polka-border">
-              <div className={`w-10 h-10 rounded-full bg-gradient-to-r ${toMeta.color} flex items-center justify-center text-white font-bold`}>
+            <div className="flex items-center gap-3 p-4 rounded-lg border border-polka-border bg-polka-darker">
+              <div className={`w-10 h-10 rounded-md border ${toMeta.color} flex items-center justify-center font-mono font-bold`}>
                 {toMeta.icon}
               </div>
               <div className="flex-1">
                 <select
                   value={toToken}
                   onChange={(e) => setToToken(e.target.value)}
-                  className="bg-transparent text-white font-semibold text-lg outline-none cursor-pointer"
+                  className="bg-transparent font-display text-white font-semibold text-lg tracking-wide outline-none cursor-pointer"
                 >
                   {TOKENS.filter((t) => t.symbol !== fromToken).map((t) => (
                     <option key={t.symbol} value={t.symbol} className="bg-polka-dark">{t.symbol}</option>
                   ))}
                 </select>
-                <p className="text-xs text-polka-text">{toMeta.name}</p>
+                <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">{toMeta.name}</p>
               </div>
               <div className="w-32 text-right text-2xl font-mono text-white/60">
                 {isQuoting ? (
-                  <Loader2 size={20} className="animate-spin ml-auto" />
+                  <Loader2 size={18} className="animate-spin ml-auto text-polka-pink" />
                 ) : toAmount ? (
                   formatBalance(toAmount, 6)
                 ) : (
-                  <span className="text-polka-text/30">0.0</span>
+                  <span className="text-polka-text/20">0.0</span>
                 )}
               </div>
             </div>
@@ -167,19 +166,19 @@ export default function SwapPage() {
 
           {/* Swap details */}
           {fromAmount && toAmount && (
-            <div className="p-3 rounded-xl bg-polka-dark/50 border border-polka-border/50 space-y-2 text-xs">
+            <div className="p-3 rounded-lg border border-polka-border bg-polka-darker space-y-2 font-mono text-[10px] tracking-wider">
               <div className="flex justify-between">
-                <span className="text-polka-text flex items-center gap-1"><Info size={12} /> Rate</span>
+                <span className="text-polka-text/40 flex items-center gap-1"><Info size={10} /> Rate</span>
                 <span className="text-white">
                   1 {fromToken} = {formatBalance(String(parseFloat(toAmount) / parseFloat(fromAmount)), 6)} {toToken}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-polka-text">Slippage tolerance</span>
+                <span className="text-polka-text/40">Slippage</span>
                 <span className="text-white">0.5%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-polka-text">Min. received</span>
+                <span className="text-polka-text/40">Min. received</span>
                 <span className="text-white">
                   {formatBalance(String(parseFloat(toAmount) * 0.995), 6)} {toToken}
                 </span>
@@ -191,9 +190,8 @@ export default function SwapPage() {
           {isConnected ? (
             <button
               disabled={!fromAmount || !toAmount}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-polka-pink to-polka-purple text-white font-bold text-lg
-                disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-all
-                shadow-lg shadow-polka-pink/20"
+              className="w-full py-4 rounded-lg border border-polka-pink/20 bg-polka-pink/10 text-polka-pink font-mono text-sm font-semibold uppercase tracking-wider
+                disabled:opacity-20 disabled:cursor-not-allowed hover:bg-polka-pink/15 transition-all"
             >
               {!fromAmount ? "Enter amount" : !toAmount ? "Fetching quote..." : "Swap"}
             </button>
@@ -204,8 +202,7 @@ export default function SwapPage() {
           )}
         </div>
 
-        {/* Powered by */}
-        <p className="text-center text-[10px] text-polka-text/50 mt-6">
+        <p className="text-center font-mono text-[8px] text-polka-text/20 mt-6 uppercase tracking-[0.2em]">
           Powered by PolkaAgent DEX on Polkadot Hub
         </p>
       </div>
