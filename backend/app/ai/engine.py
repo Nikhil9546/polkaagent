@@ -1,4 +1,5 @@
 import json
+import re
 import logging
 from typing import AsyncGenerator
 from openai import AsyncOpenAI
@@ -6,6 +7,19 @@ from ..config import get_settings
 from .prompts import SYSTEM_PROMPT, TOOLS
 
 logger = logging.getLogger(__name__)
+
+# DeepSeek sometimes leaks raw DSML tool call tags in its response
+_DSML_PATTERN = re.compile(r'<[｜\|]DSML[｜\|][^>]*>.*?(?:</[｜\|]DSML[｜\|][^>]*>|$)', re.DOTALL)
+_DSML_BLOCK_PATTERN = re.compile(r'<[｜\|]DSML[｜\|]function_calls>.*', re.DOTALL)
+
+
+def _clean_dsml(text: str) -> str:
+    """Strip leaked DeepSeek DSML markup from AI responses."""
+    if not text:
+        return text
+    text = _DSML_BLOCK_PATTERN.sub('', text)
+    text = _DSML_PATTERN.sub('', text)
+    return text.strip()
 
 
 class DeepSeekEngine:
@@ -50,7 +64,7 @@ class DeepSeekEngine:
         }
 
         if choice.message.content:
-            result["message"] = choice.message.content
+            result["message"] = _clean_dsml(choice.message.content)
 
         if choice.message.tool_calls:
             for tool_call in choice.message.tool_calls:
@@ -192,4 +206,4 @@ class DeepSeekEngine:
             max_tokens=512,
         )
 
-        return response.choices[0].message.content or ""
+        return _clean_dsml(response.choices[0].message.content or "")
