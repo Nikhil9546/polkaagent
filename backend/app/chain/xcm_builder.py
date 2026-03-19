@@ -1,34 +1,10 @@
 """Build SCALE-encoded XCM messages for real cross-chain transfers.
 
-Based on the working example from Polkadot docs:
-0x050c000401000003008c86471301000003008c8647000d01010100000001
-0100368e8759910dab756d344995f1d3c79374ca8f70066d3a709e48029f6bf0ee7e
-
-Format (V4 XCM):
-  05          - VersionedXcm::V4
-  0c          - compact 3 instructions
-  [WithdrawAsset]
-    00        - instruction index
-    04        - compact 1 asset
-    01 00     - asset location: parents=1, interior=Here
-    00        - fungibility id (Concrete implied in V4)
-    03 008c864713 - fungible amount (compact encoded)
-  [BuyExecution]
-    13        - instruction index (19)
-    01 00     - asset location: parents=1, interior=Here
-    00        - concrete
-    03 008c864713 - fungible amount
-    00        - weight_limit: Unlimited
-  [DepositAsset]
-    0d        - instruction index (13)
-    01        - assets: Wild(All)
-    01 01     - beneficiary: parents=0, X1
-    00        - junction: AccountId32
-    00        - network: None
-    [32 bytes] - account id
+Tested and verified on Polkadot Hub TestNet:
+- TX 0xed038b52... — 0.15 PAS transfer confirmed on-chain
+- Minimum amount: ~0.1074 PAS (execution fee requirement)
 """
 import logging
-import struct
 from web3 import Web3
 from ..config import get_settings
 from .client import w3
@@ -43,77 +19,43 @@ XCM_ABI = [
     {"inputs": [{"name": "message", "type": "bytes"}], "name": "weighMessage", "outputs": [{"name": "weight", "type": "tuple", "components": [{"name": "refTime", "type": "uint64"}, {"name": "proofSize", "type": "uint64"}]}], "stateMutability": "view", "type": "function"},
 ]
 
-# Working example for reference
-EXAMPLE_MSG = bytes.fromhex("050c000401000003008c86471301000003008c8647000d010101000000010100368e8759910dab756d344995f1d3c79374ca8f70066d3a709e48029f6bf0ee7e")
+# Working template from Polkadot docs (verified on-chain)
+WORKING_TEMPLATE = bytes.fromhex(
+    "050c000401000003008c86471301000003008c8647"
+    "000d010101000000010100"
+    "368e8759910dab756d344995f1d3c79374ca8f70066d3a709e48029f6bf0ee7e"
+)
 
-
-def _compact_encode(value: int) -> bytes:
-    """SCALE compact encoding."""
-    if value < 64:
-        return bytes([value << 2])
-    elif value < 2**14:
-        v = (value << 2) | 1
-        return struct.pack("<H", v)
-    elif value < 2**30:
-        v = (value << 2) | 2
-        return struct.pack("<I", v)
-    else:
-        raw = value.to_bytes((value.bit_length() + 7) // 8, "little")
-        return bytes([(len(raw) - 4) << 2 | 3]) + raw
+# Minimum XCM transfer: ~0.1074 PAS (execution fee requirement)
+MIN_AMOUNT_PLANCK = 1_080_000_000
 
 
 def _evm_to_account32(evm_address: str) -> bytes:
     """Convert EVM address to 32-byte account ID."""
-    addr = bytes.fromhex(evm_address.replace("0x", ""))
-    return b'\x00' * 12 + addr
+    return b'\x00' * 12 + bytes.fromhex(evm_address.replace("0x", ""))
 
 
 def build_xcm_transfer(amount_planck: int, beneficiary_evm: str) -> bytes:
     """
-    Build XCM V4 message matching the exact format of the working example.
+    Build XCM V5 message by modifying the verified working template.
 
-    Transfers native DOT/PAS with:
-    1. WithdrawAsset(amount)
-    2. BuyExecution(amount/2)
-    3. DepositAsset(All, beneficiary)
+    Replaces:
+    - bytes [8:12]  — WithdrawAsset amount (LE u32)
+    - bytes [17:21] — BuyExecution amount (LE u32, same as withdraw to meet minimum)
+    - bytes [32:64] — Beneficiary account (32 bytes)
     """
+    if amount_planck < MIN_AMOUNT_PLANCK:
+        raise ValueError(f"Amount {amount_planck} below minimum {MIN_AMOUNT_PLANCK} planck (~0.108 PAS)")
+
     account_id = _evm_to_account32(beneficiary_evm)
-    exec_amount = amount_planck // 2
+    le_amount = amount_planck.to_bytes(4, 'little')
 
-    amount_encoded = _compact_encode(amount_planck)
-    exec_encoded = _compact_encode(exec_amount)
+    msg = bytearray(WORKING_TEMPLATE)
+    msg[8:12] = le_amount    # WithdrawAsset amount
+    msg[17:21] = le_amount   # BuyExecution amount (same to meet minimum)
+    msg[32:64] = account_id  # Beneficiary
 
-    msg = bytes()
-
-    # Version: V4
-    msg += bytes([0x05])
-
-    # Compact 3 instructions
-    msg += bytes([0x0c])
-
-    # Instruction 1: WithdrawAsset
-    msg += bytes([0x00])        # enum: WithdrawAsset
-    msg += bytes([0x04])        # compact 1 asset
-    msg += bytes([0x01, 0x00])  # location: parents=1, Here
-    msg += bytes([0x00])        # concrete/fungibility
-    msg += amount_encoded       # amount
-
-    # Instruction 2: BuyExecution
-    msg += bytes([0x13])        # enum: BuyExecution (19)
-    msg += bytes([0x01, 0x00])  # location: parents=1, Here
-    msg += bytes([0x00])        # concrete
-    msg += exec_encoded         # exec fee amount
-    msg += bytes([0x00])        # weight_limit: Unlimited
-
-    # Instruction 3: DepositAsset
-    msg += bytes([0x0d])        # enum: DepositAsset (13)
-    msg += bytes([0x01])        # assets: Wild(All)
-    msg += bytes([0x01, 0x01])  # beneficiary: parents=0, X1
-    msg += bytes([0x00])        # junction: AccountId32
-    msg += bytes([0x00])        # network: None
-    msg += account_id           # 32 bytes account
-
-    return msg
+    return bytes(msg)
 
 
 def execute_real_xcm_transfer(
@@ -126,48 +68,38 @@ def execute_real_xcm_transfer(
     if not private_key:
         private_key = settings.agent_private_key
 
-    # 10 decimals for XCM DOT/PAS
+    # Convert to planck (10 decimals for XCM)
     amount_planck = int(amount_pas * 10**10)
+
+    # Enforce minimum
+    if amount_planck < MIN_AMOUNT_PLANCK:
+        return {"error": f"Minimum XCM transfer is ~0.108 PAS. You requested {amount_pas} PAS."}
 
     if not beneficiary:
         beneficiary = w3.eth.account.from_key(private_key).address
 
     logger.info(f"XCM Transfer: {amount_pas} PAS ({amount_planck} planck) to {beneficiary}")
 
-    xcm_message = build_xcm_transfer(amount_planck, beneficiary)
+    # Build message
+    try:
+        xcm_message = build_xcm_transfer(amount_planck, beneficiary)
+    except ValueError as e:
+        return {"error": str(e)}
 
     logger.info(f"XCM message ({len(xcm_message)} bytes): 0x{xcm_message.hex()}")
 
-    # Verify message format by comparing structure to working example
-    logger.info(f"Working example ({len(EXAMPLE_MSG)} bytes): 0x{EXAMPLE_MSG.hex()}")
-
+    # Verify with weighMessage
     xcm_contract = w3.eth.contract(
         address=Web3.to_checksum_address(XCM_PRECOMPILE),
         abi=XCM_ABI,
     )
 
-    # Get weight
     try:
         weight = xcm_contract.functions.weighMessage(xcm_message).call()
         ref_time, proof_size = weight[0], weight[1]
-        logger.info(f"Weight: refTime={ref_time}, proofSize={proof_size}")
+        logger.info(f"Weight OK: refTime={ref_time}, proofSize={proof_size}")
     except Exception as e:
-        # Fallback: try with the example message format but swapped amount/beneficiary
-        logger.warning(f"Custom message failed weighMessage: {e}")
-        logger.info("Falling back to modified example message...")
-
-        # Use example but replace beneficiary bytes (last 32 bytes before end)
-        account_id = _evm_to_account32(beneficiary)
-        fallback_msg = bytearray(EXAMPLE_MSG)
-        fallback_msg[32:64] = account_id
-        xcm_message = bytes(fallback_msg)
-
-        try:
-            weight = xcm_contract.functions.weighMessage(xcm_message).call()
-            ref_time, proof_size = weight[0], weight[1]
-            logger.info(f"Fallback weight: refTime={ref_time}, proofSize={proof_size}")
-        except Exception as e2:
-            return {"error": f"XCM message encoding failed: {str(e2)}"}
+        return {"error": f"XCM message validation failed: {str(e)}"}
 
     # Execute
     try:
@@ -198,10 +130,8 @@ def execute_real_xcm_transfer(
                 "amount_planck": amount_planck,
                 "beneficiary": beneficiary,
                 "dest_parachain": dest_para_id,
-                "xcm_message_hex": f"0x{xcm_message.hex()}",
-                "xcm_message_bytes": len(xcm_message),
             },
-            "description": f"XCM: Transferred {amount_pas} PAS to {beneficiary[:10]}... on parachain {dest_para_id}",
+            "description": f"XCM: Transferred {amount_pas} PAS to {beneficiary[:10]}... via cross-chain message",
         }
     except Exception as e:
         logger.error(f"XCM execute failed: {e}", exc_info=True)
