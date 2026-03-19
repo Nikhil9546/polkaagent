@@ -25,7 +25,7 @@ export function ConnectButton() {
     return (
       <button
         onClick={() => connect({ connector: injected() })}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-mono text-[11px] font-semibold uppercase tracking-wider
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-mono text-[11px] font-semibold uppercase tracking-wider
           border border-polka-pink/20 bg-polka-pink/10 text-polka-pink
           hover:bg-polka-pink/15 transition-all duration-200"
       >

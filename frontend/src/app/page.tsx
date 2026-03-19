@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import {
   Bot,
@@ -72,6 +72,147 @@ export default function Home() {
 
   if (!isConnected) return <LandingPage />;
   return <Dashboard address={address!} />;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  SCROLL REVEAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function ScrollReveal({ children, delay = 0, className = "", scale = false }: {
+  children: React.ReactNode; delay?: number; className?: string; scale?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`${visible ? (scale ? "scroll-reveal-scale" : "scroll-reveal") : "scroll-hidden"} ${className}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  TYPING TEXT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function TypingText({ text, speed = 30 }: { text: string; speed?: number }) {
+  const [displayed, setDisplayed] = useState("");
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    setDisplayed("");
+    let i = 0;
+    const timer = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) clearInterval(timer);
+    }, speed);
+    return () => clearInterval(timer);
+  }, [started, text, speed]);
+
+  return (
+    <div ref={ref} className="px-3 py-2 rounded-lg border border-polka-border bg-polka-darker text-[11px] text-polka-text/50 font-mono min-h-[36px]">
+      {started ? (
+        <>
+          {displayed}
+          {displayed.length < text.length && (
+            <span className="inline-block w-[6px] h-[13px] bg-polka-pink/60 ml-[1px] align-middle animate-pulse" />
+          )}
+        </>
+      ) : (
+        <span className="opacity-0">{text}</span>
+      )}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  FLOW DIAGRAM (animated steps)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const flowSteps = [
+  { label: "Signal Detected", sub: "DEX pool analysis" },
+  { label: "AI Analyzes", sub: "DeepSeek V3" },
+  { label: "Validates", sub: "Balance + limits" },
+  { label: "Executes", sub: "Agent signs tx" },
+  { label: "Confirmed", sub: "On Polkadot Hub" },
+];
+
+function FlowDiagram() {
+  const [activeStep, setActiveStep] = useState(-1);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    let i = -1;
+    const timer = setInterval(() => {
+      i++;
+      setActiveStep(i);
+      if (i >= flowSteps.length - 1) clearInterval(timer);
+    }, 400);
+    return () => clearInterval(timer);
+  }, [started]);
+
+  return (
+    <div ref={ref} className="flex items-center justify-between overflow-x-auto gap-2">
+      {flowSteps.map((step, i) => (
+        <div key={step.label} className="flex items-center gap-3 flex-shrink-0">
+          <div className={`text-center transition-all duration-500 ${i <= activeStep ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+            <div className={`w-12 h-12 rounded-lg border flex items-center justify-center font-display text-lg font-bold mx-auto mb-2 transition-all duration-500 ${
+              i <= activeStep ? "border-polka-pink/30 bg-polka-pink/10 text-polka-pink" : "border-polka-pink/15 bg-polka-pink/[0.05] text-polka-pink/30"
+            }`}>
+              {i + 1}
+            </div>
+            <p className="font-display text-[12px] font-semibold text-white tracking-wide">{step.label}</p>
+            <p className="font-mono text-[8px] text-polka-text/30 uppercase tracking-wider">{step.sub}</p>
+          </div>
+          {i < 4 && (
+            <ArrowRight size={14} className={`flex-shrink-0 mt-[-16px] transition-all duration-300 ${i < activeStep ? "text-polka-pink/40" : "text-polka-pink/10"}`} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -154,11 +295,13 @@ function LandingPage() {
               { value: "100%", label: "On-Chain" },
               { value: "< 2s", label: "Execution" },
               { value: "24/7", label: "Monitoring" },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center p-4 rounded-lg border border-polka-border bg-polka-card/30">
-                <p className="num-display text-3xl md:text-4xl text-polka-pink">{stat.value}</p>
-                <p className="font-mono text-[9px] text-polka-text/50 mt-1.5 uppercase tracking-[0.25em]">{stat.label}</p>
-              </div>
+            ].map((stat, i) => (
+              <ScrollReveal key={stat.label} delay={i * 150} scale>
+                <div className="text-center p-4 rounded-lg border border-polka-border bg-polka-card/30">
+                  <p className="num-display text-3xl md:text-4xl text-polka-pink">{stat.value}</p>
+                  <p className="font-mono text-[9px] text-polka-text/50 mt-1.5 uppercase tracking-[0.25em]">{stat.label}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -173,14 +316,14 @@ function LandingPage() {
       {/* Features */}
       <section id="features" className="py-28 px-6 relative">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-16">
+          <ScrollReveal className="mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-5">
               <Zap size={12} className="text-polka-pink" />
               <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">Features</span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Not Just Another<br />DeFi Dashboard</h2>
             <p className="text-polka-text mt-3 max-w-md font-light">PolkaAgent doesn&apos;t just show you data. It acts on it.</p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
@@ -220,17 +363,19 @@ function LandingPage() {
                 desc: "Powered by DeepSeek V3 with function calling. The AI reasons about your intent and executes.",
                 tag: "Intelligence",
               },
-            ].map((f) => (
-              <div key={f.title} className="group p-6 rounded-xl tech-card corner-accents card-shine">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-10 h-10 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink group-hover:bg-polka-pink/10 transition-smooth">
-                    {f.icon}
+            ].map((f, i) => (
+              <ScrollReveal key={f.title} delay={i * 100} scale>
+                <div className="group p-6 rounded-xl tech-card corner-accents card-shine h-full">
+                  <div className="flex items-center justify-between mb-5">
+                    <div className="w-10 h-10 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink group-hover:bg-polka-pink/10 transition-smooth">
+                      {f.icon}
+                    </div>
+                    <span className="font-mono text-[8px] text-polka-text/30 uppercase tracking-[0.2em]">{f.tag}</span>
                   </div>
-                  <span className="font-mono text-[8px] text-polka-text/30 uppercase tracking-[0.2em]">{f.tag}</span>
+                  <h3 className="font-display text-[17px] font-semibold text-white mb-2 tracking-wide">{f.title}</h3>
+                  <p className="text-[13px] text-polka-text/60 leading-relaxed">{f.desc}</p>
                 </div>
-                <h3 className="font-display text-[17px] font-semibold text-white mb-2 tracking-wide">{f.title}</h3>
-                <p className="text-[13px] text-polka-text/60 leading-relaxed">{f.desc}</p>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -239,13 +384,13 @@ function LandingPage() {
       {/* How it Works */}
       <section id="how-it-works" className="py-28 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-16">
+          <ScrollReveal className="mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-5">
               <Activity size={12} className="text-polka-pink" />
               <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">How it Works</span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Three Modes of<br />Operation</h2>
-          </div>
+          </ScrollReveal>
 
           <div className="space-y-4">
             {[
@@ -270,24 +415,24 @@ function LandingPage() {
                 icon: <Activity size={18} />,
                 example: "Toggle ON -> AI detects 4% arbitrage -> Swaps 3.8 PAS -> Confirmed on-chain",
               },
-            ].map((item) => (
-              <div key={item.step} className="flex gap-6 p-6 rounded-xl tech-card group">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center font-display text-polka-pink font-bold text-lg group-hover:bg-polka-pink/10 group-hover:border-polka-pink/30 transition-smooth">
-                    {item.step}
+            ].map((item, i) => (
+              <ScrollReveal key={item.step} delay={i * 200}>
+                <div className="flex gap-6 p-6 rounded-xl tech-card group">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center font-display text-polka-pink font-bold text-lg group-hover:bg-polka-pink/10 group-hover:border-polka-pink/30 transition-smooth">
+                      {item.step}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-polka-text/40">{item.icon}</span>
+                      <h3 className="font-display text-[17px] font-semibold text-white tracking-wide">{item.title}</h3>
+                    </div>
+                    <p className="text-[13px] text-polka-text/60 leading-relaxed mb-3">{item.desc}</p>
+                    <TypingText text={item.example} speed={25} />
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-polka-text/40">{item.icon}</span>
-                    <h3 className="font-display text-[17px] font-semibold text-white tracking-wide">{item.title}</h3>
-                  </div>
-                  <p className="text-[13px] text-polka-text/60 leading-relaxed mb-3">{item.desc}</p>
-                  <div className="px-3 py-2 rounded-lg border border-polka-border bg-polka-darker text-[11px] text-polka-text/50 font-mono">
-                    {item.example}
-                  </div>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -296,14 +441,14 @@ function LandingPage() {
       {/* Architecture */}
       <section id="architecture" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
-          <div className="mb-16">
+          <ScrollReveal className="mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-5">
               <Cpu size={12} className="text-polka-pink" />
               <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">Architecture</span>
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Built on Real<br />Infrastructure</h2>
             <p className="text-polka-text mt-3 font-light">Every transaction is real. Every contract is deployed. Nothing is simulated.</p>
-          </div>
+          </ScrollReveal>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {[
@@ -311,91 +456,80 @@ function LandingPage() {
               { icon: <Cpu size={18} />, label: "DeepSeek V3", sub: "AI Engine" },
               { icon: <ArrowRightLeft size={18} />, label: "PolkaSwap DEX", sub: "Real AMM" },
               { icon: <Lock size={18} />, label: "AgentWallet", sub: "Smart Contract" },
-            ].map((item) => (
-              <div key={item.label} className="p-4 rounded-xl tech-card text-center">
-                <div className="w-10 h-10 rounded-lg border border-polka-border bg-polka-darker flex items-center justify-center text-polka-pink mx-auto mb-3">
-                  {item.icon}
+            ].map((item, i) => (
+              <ScrollReveal key={item.label} delay={i * 120} scale>
+                <div className="p-4 rounded-xl tech-card text-center h-full">
+                  <div className="w-10 h-10 rounded-lg border border-polka-border bg-polka-darker flex items-center justify-center text-polka-pink mx-auto mb-3">
+                    {item.icon}
+                  </div>
+                  <p className="font-display text-[14px] font-semibold text-white tracking-wide">{item.label}</p>
+                  <p className="font-mono text-[9px] text-polka-text/40 mt-0.5 uppercase tracking-wider">{item.sub}</p>
                 </div>
-                <p className="font-display text-[14px] font-semibold text-white tracking-wide">{item.label}</p>
-                <p className="font-mono text-[9px] text-polka-text/40 mt-0.5 uppercase tracking-wider">{item.sub}</p>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
 
           {/* Flow diagram */}
-          <div className="p-6 rounded-xl tech-card">
-            <div className="flex items-center justify-between overflow-x-auto gap-2">
-              {[
-                { label: "Signal Detected", sub: "DEX pool analysis" },
-                { label: "AI Analyzes", sub: "DeepSeek V3" },
-                { label: "Validates", sub: "Balance + limits" },
-                { label: "Executes", sub: "Agent signs tx" },
-                { label: "Confirmed", sub: "On Polkadot Hub" },
-              ].map((step, i) => (
-                <div key={step.label} className="flex items-center gap-3 flex-shrink-0">
-                  <div className="text-center">
-                    <div className="w-12 h-12 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink font-display text-lg font-bold mx-auto mb-2">
-                      {i + 1}
-                    </div>
-                    <p className="font-display text-[12px] font-semibold text-white tracking-wide">{step.label}</p>
-                    <p className="font-mono text-[8px] text-polka-text/30 uppercase tracking-wider">{step.sub}</p>
-                  </div>
-                  {i < 4 && <ArrowRight size={14} className="text-polka-pink/20 flex-shrink-0 mt-[-16px]" />}
-                </div>
-              ))}
+          <ScrollReveal>
+            <div className="p-6 rounded-xl tech-card">
+              <FlowDiagram />
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Comparison */}
       <section className="py-28 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
+          <ScrollReveal className="text-center mb-12">
             <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">Why PolkaAgent?</h2>
-          </div>
+          </ScrollReveal>
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-6 rounded-xl tech-card">
-              <h3 className="font-display text-[15px] font-semibold text-polka-text/50 mb-4 tracking-wide uppercase">Traditional DeFi</h3>
-              <div className="space-y-3">
-                {[
-                  "Navigate to DEX manually",
-                  "Approve token -> wait -> swap -> wait",
-                  "Check prices yourself",
-                  "Miss opportunities while sleeping",
-                  "One action at a time",
-                  "No risk management",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2.5 text-[13px] text-polka-text/40">
-                    <span className="text-red-400/50 text-[10px]">&#10005;</span> {item}
-                  </div>
-                ))}
+            <ScrollReveal delay={0}>
+              <div className="p-6 rounded-xl tech-card h-full">
+                <h3 className="font-display text-[15px] font-semibold text-polka-text/50 mb-4 tracking-wide uppercase">Traditional DeFi</h3>
+                <div className="space-y-3">
+                  {[
+                    "Navigate to DEX manually",
+                    "Approve token -> wait -> swap -> wait",
+                    "Check prices yourself",
+                    "Miss opportunities while sleeping",
+                    "One action at a time",
+                    "No risk management",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-2.5 text-[13px] text-polka-text/40">
+                      <span className="text-red-400/50 text-[10px]">&#10005;</span> {item}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="p-6 rounded-xl tech-card border-polka-pink/10">
-              <h3 className="font-display text-[15px] font-semibold text-polka-pink mb-4 tracking-wide uppercase">PolkaAgent</h3>
-              <div className="space-y-3">
-                {[
-                  "One-click autonomous execution",
-                  "AI handles approvals and routing",
-                  "Real-time signal detection",
-                  "24/7 continuous auto-trading",
-                  "Multi-step strategies in one command",
-                  "On-chain spending limits + guardrails",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-2.5 text-[13px] text-white/70">
-                    <span className="text-emerald-400 text-[10px]">&#10003;</span> {item}
-                  </div>
-                ))}
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <div className="p-6 rounded-xl tech-card border-polka-pink/10 h-full">
+                <h3 className="font-display text-[15px] font-semibold text-polka-pink mb-4 tracking-wide uppercase">PolkaAgent</h3>
+                <div className="space-y-3">
+                  {[
+                    "One-click autonomous execution",
+                    "AI handles approvals and routing",
+                    "Real-time signal detection",
+                    "24/7 continuous auto-trading",
+                    "Multi-step strategies in one command",
+                    "On-chain spending limits + guardrails",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-2.5 text-[13px] text-white/70">
+                      <span className="text-emerald-400 text-[10px]">&#10003;</span> {item}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-28 px-6">
-        <div className="max-w-2xl mx-auto text-center">
+        <ScrollReveal className="max-w-2xl mx-auto text-center">
           <div className="w-16 h-16 rounded-lg border border-polka-pink/20 bg-polka-card flex items-center justify-center mx-auto mb-8">
             <Bot size={32} className="text-polka-pink" />
           </div>
@@ -403,7 +537,7 @@ function LandingPage() {
           <p className="text-polka-text mb-8 font-light">Connect your wallet to access the dashboard. No signup. No KYC. Just connect and go.</p>
           <ConnectButton />
           <p className="font-mono text-[9px] text-polka-text/20 mt-8 uppercase tracking-[0.15em]">Built for the Polkadot Solidity Hackathon 2026 | Track 1: AI-Powered DeFi</p>
-        </div>
+        </ScrollReveal>
       </section>
 
       {/* Footer */}
