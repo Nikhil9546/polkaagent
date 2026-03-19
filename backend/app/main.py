@@ -48,15 +48,23 @@ async def health():
 @app.get("/debug/config")
 async def debug_config():
     from .config import get_settings
+    from .chain.client import WALLET_FACTORY_ABI, AGENT_WALLET_ABI, ROUTER_ABI
     s = get_settings()
     return {
-        "wallet_factory": s.wallet_factory_address[:10] + "..." if s.wallet_factory_address else "NOT SET",
-        "router": s.router_address[:10] + "..." if s.router_address else "NOT SET",
-        "wpas": s.wpas_address[:10] + "..." if s.wpas_address else "NOT SET",
-        "usdt": s.usdt_address[:10] + "..." if s.usdt_address else "NOT SET",
-        "usdc": s.usdc_address[:10] + "..." if s.usdc_address else "NOT SET",
+        "wallet_factory": s.wallet_factory_address,
+        "router": s.router_address,
+        "wpas": s.wpas_address,
+        "usdt": s.usdt_address,
+        "usdc": s.usdc_address,
+        "factory": s.factory_address,
+        "intent_executor": s.intent_executor_address,
         "rpc": s.rpc_url,
         "chain_id": s.chain_id,
         "has_deepseek": bool(s.deepseek_api_key),
         "has_agent_key": bool(s.agent_private_key),
+        "abi_sizes": {
+            "wallet_factory": len(WALLET_FACTORY_ABI),
+            "agent_wallet": len(AGENT_WALLET_ABI),
+            "router": len(ROUTER_ABI),
+        },
     }
