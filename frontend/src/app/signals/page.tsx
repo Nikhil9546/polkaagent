@@ -119,7 +119,7 @@ export default function SignalsPage() {
           </Link>
           <div>
             <h1 className="font-display text-lg font-bold text-white tracking-wide">Trading Signals</h1>
-            <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-[0.2em]">AI-Powered Market Analysis</p>
+            <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-[0.2em]">AI-Powered Market Analysis</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -140,16 +140,16 @@ export default function SignalsPage() {
           {Object.entries(prices).map(([token, data]: [string, any]) => (
             <div key={token} className="p-5 rounded-xl tech-card corner-accents">
               <div className="flex items-center justify-between mb-3">
-                <span className="font-mono text-[9px] text-polka-text/40 uppercase tracking-[0.2em]">PAS / {token}</span>
-                <span className="font-mono text-[8px] px-2 py-0.5 rounded-md border border-polka-border bg-polka-darker text-polka-text/40 uppercase tracking-wider">DEX</span>
+                <span className="font-mono text-[9px] text-polka-text/70 uppercase tracking-[0.2em]">PAS / {token}</span>
+                <span className="font-mono text-[8px] px-2 py-0.5 rounded-md border border-polka-border bg-polka-darker text-polka-text/70 uppercase tracking-wider">DEX</span>
               </div>
               <p className="num-display text-3xl text-white">
                 {parseFloat(data.price_in_pas).toFixed(4)}
               </p>
-              <p className="font-mono text-[10px] text-polka-text/40 mt-1 tracking-wider">
+              <p className="font-mono text-[10px] text-polka-text/70 mt-1 tracking-wider">
                 ${parseFloat(data.price_in_usd).toFixed(4)} USD
               </p>
-              <div className="flex gap-4 mt-3 font-mono text-[9px] text-polka-text/30 tracking-wider">
+              <div className="flex gap-4 mt-3 font-mono text-[9px] text-polka-text/60 tracking-wider">
                 <span>PAS: {parseFloat(data.reserve_pas).toFixed(1)}</span>
                 <span>{token}: {parseFloat(data.reserve_token).toFixed(1)}</span>
               </div>
@@ -183,7 +183,7 @@ export default function SignalsPage() {
         {/* Trade Results */}
         {tradeResults.length > 0 && (
           <div className="space-y-2">
-            <h3 className="tech-label text-polka-text/50 flex items-center gap-2">
+            <h3 className="tech-label text-polka-text/80 flex items-center gap-2">
               <Check size={12} className="text-emerald-400" />
               Executed Trades
             </h3>
@@ -217,16 +217,16 @@ export default function SignalsPage() {
 
         {/* Signals */}
         <div className="space-y-2">
-          <h3 className="tech-label text-polka-text/50 flex items-center gap-2">
+          <h3 className="tech-label text-polka-text/80 flex items-center gap-2">
             <Zap size={12} />
             Active Signals ({signals.length})
           </h3>
 
           {signals.length === 0 ? (
             <div className="text-center py-12">
-              <TrendingUp size={40} className="mx-auto text-polka-text/10 mb-4" />
-              <p className="font-mono text-polka-text/30 text-[10px] uppercase tracking-wider">No signals right now. Market is stable.</p>
-              <p className="font-mono text-polka-text/15 text-[9px] mt-2 tracking-wider">Signals are generated from DEX pool analysis</p>
+              <TrendingUp size={40} className="mx-auto text-polka-text/30 mb-4" />
+              <p className="font-mono text-polka-text/60 text-[10px] uppercase tracking-wider">No signals right now. Market is stable.</p>
+              <p className="font-mono text-polka-text/40 text-[9px] mt-2 tracking-wider">Signals are generated from DEX pool analysis</p>
             </div>
           ) : (
             signals.map((signal, i) => (
@@ -242,17 +242,17 @@ export default function SignalsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${STRENGTH_DOTS[signal.strength] || STRENGTH_DOTS.WEAK}`} />
-                    <span className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">{signal.strength}</span>
+                    <span className="font-mono text-[8px] text-polka-text/70 uppercase tracking-wider">{signal.strength}</span>
                   </div>
                 </div>
-                <p className="text-[13px] text-polka-text/60 mb-2 leading-relaxed">{signal.reason}</p>
+                <p className="text-[13px] text-polka-text/85 mb-2 leading-relaxed">{signal.reason}</p>
                 <div className="flex items-center justify-between font-mono text-[10px] tracking-wider">
-                  <span className="text-polka-text/40">
+                  <span className="text-polka-text/70">
                     Price: {parseFloat(signal.current_price).toFixed(4)} PAS
                   </span>
-                  <span className="text-polka-text/30">{signal.change_pct}</span>
+                  <span className="text-polka-text/60">{signal.change_pct}</span>
                 </div>
-                <div className="mt-2 p-2.5 rounded-lg border border-polka-border bg-polka-darker font-mono text-[10px] text-polka-text/40 tracking-wider">
+                <div className="mt-2 p-2.5 rounded-lg border border-polka-border bg-polka-darker font-mono text-[10px] text-polka-text/70 tracking-wider">
                   {signal.recommended_action}
                 </div>
               </div>

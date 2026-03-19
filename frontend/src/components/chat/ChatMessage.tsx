@@ -32,7 +32,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
       {/* Content */}
       <div className={`flex-1 max-w-[80%] ${isUser ? "text-right" : ""}`}>
         {/* Label */}
-        <p className={`text-[10px] text-polka-text/30 mb-1 font-medium tracking-wide ${isUser ? "text-right" : ""}`}>
+        <p className={`text-[10px] text-polka-text/60 mb-1 font-medium tracking-wide ${isUser ? "text-right" : ""}`}>
           {isUser ? "You" : "PolkaAgent"}
         </p>
 
@@ -62,7 +62,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         )}
 
         {/* Timestamp */}
-        <p className={`text-[9px] text-polka-text/20 mt-1.5 font-mono ${isUser ? "text-right" : ""}`}>
+        <p className={`text-[9px] text-polka-text/50 mt-1.5 font-mono ${isUser ? "text-right" : ""}`}>
           {new Date(message.timestamp).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",

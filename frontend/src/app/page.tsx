@@ -139,7 +139,7 @@ function TypingText({ text, speed = 30 }: { text: string; speed?: number }) {
   }, [started, text, speed]);
 
   return (
-    <div ref={ref} className="px-3 py-2 rounded-lg border border-polka-border bg-polka-darker text-[11px] text-polka-text/50 font-mono min-h-[36px]">
+    <div ref={ref} className="px-3 py-2 rounded-lg border border-polka-border bg-polka-darker text-[11px] text-polka-text/80 font-mono min-h-[36px]">
       {started ? (
         <>
           {displayed}
@@ -204,12 +204,80 @@ function FlowDiagram() {
               {i + 1}
             </div>
             <p className="font-display text-[12px] font-semibold text-white tracking-wide">{step.label}</p>
-            <p className="font-mono text-[8px] text-polka-text/30 uppercase tracking-wider">{step.sub}</p>
+            <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-wider">{step.sub}</p>
           </div>
           {i < 4 && (
             <ArrowRight size={14} className={`flex-shrink-0 mt-[-16px] transition-all duration-300 ${i < activeStep ? "text-polka-pink/40" : "text-polka-pink/10"}`} />
           )}
         </div>
+      ))}
+    </div>
+  );
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  SIDE BORDERS (Obscura-style animated edges)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function SideBorders() {
+  const particles = [
+    // Left side — going up
+    { side: "left", dir: "up", duration: 7, delay: 0 },
+    { side: "left", dir: "up", duration: 9, delay: 2.5 },
+    { side: "left", dir: "up", duration: 11, delay: 5 },
+    { side: "left", dir: "down", duration: 8, delay: 1 },
+    { side: "left", dir: "down", duration: 10, delay: 4 },
+    // Right side — going down
+    { side: "right", dir: "down", duration: 8, delay: 0.5 },
+    { side: "right", dir: "down", duration: 10, delay: 3 },
+    { side: "right", dir: "down", duration: 12, delay: 6 },
+    { side: "right", dir: "up", duration: 7, delay: 2 },
+    { side: "right", dir: "up", duration: 9, delay: 4.5 },
+  ];
+
+  const glows = [
+    { side: "left", duration: 6, delay: 0 },
+    { side: "left", duration: 8, delay: 3 },
+    { side: "right", duration: 7, delay: 1.5 },
+    { side: "right", duration: 9, delay: 4.5 },
+  ];
+
+  return (
+    <div className="side-borders">
+      {/* Vertical lines */}
+      <div className="side-border-line left" />
+      <div className="side-border-line right" />
+
+      {/* Corner brackets */}
+      <div className="corner-bracket tl" />
+      <div className="corner-bracket tr" />
+      <div className="corner-bracket bl" />
+      <div className="corner-bracket br" />
+
+      {/* Floating particles */}
+      {particles.map((p, i) => (
+        <div
+          key={`p-${i}`}
+          className={`side-particle ${p.dir}`}
+          style={{
+            [p.side]: p.side === "left" ? "31px" : "31px",
+            ["--duration" as string]: `${p.duration}s`,
+            ["--delay" as string]: `${p.delay}s`,
+          }}
+        />
+      ))}
+
+      {/* Glow streaks */}
+      {glows.map((g, i) => (
+        <div
+          key={`g-${i}`}
+          className="side-border-glow"
+          style={{
+            [g.side]: g.side === "left" ? "32px" : "32px",
+            ["--duration" as string]: `${g.duration}s`,
+            ["--delay" as string]: `${g.delay}s`,
+          }}
+        />
       ))}
     </div>
   );
@@ -232,6 +300,9 @@ function LandingPage() {
       {/* Grid background */}
       <div className="fixed inset-0 grid-bg pointer-events-none" />
 
+      {/* Animated side borders */}
+      <SideBorders />
+
       {/* Nav */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? "glass border-b border-polka-pink/[0.06]" : ""}`}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -243,13 +314,13 @@ function LandingPage() {
               <span className="font-display text-lg font-bold tracking-wider uppercase">
                 Polka<span className="text-polka-pink">Agent</span>
               </span>
-              <span className="font-mono text-[9px] text-polka-text/40">v1.0</span>
+              <span className="font-mono text-[9px] text-polka-text/70">v1.0</span>
             </div>
           </div>
           <div className="flex items-center gap-6">
-            <a href="#features" className="font-mono text-[10px] text-polka-text/40 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">Features</a>
-            <a href="#how-it-works" className="font-mono text-[10px] text-polka-text/40 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">How it Works</a>
-            <a href="#architecture" className="font-mono text-[10px] text-polka-text/40 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">Architecture</a>
+            <a href="#features" className="font-mono text-[10px] text-polka-text/70 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">Features</a>
+            <a href="#how-it-works" className="font-mono text-[10px] text-polka-text/70 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">How it Works</a>
+            <a href="#architecture" className="font-mono text-[10px] text-polka-text/70 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">Architecture</a>
             <ConnectButton />
           </div>
         </div>
@@ -299,7 +370,7 @@ function LandingPage() {
               <ScrollReveal key={stat.label} delay={i * 150} scale>
                 <div className="text-center p-4 rounded-lg border border-polka-border bg-polka-card/30">
                   <p className="num-display text-3xl md:text-4xl text-polka-pink">{stat.value}</p>
-                  <p className="font-mono text-[9px] text-polka-text/50 mt-1.5 uppercase tracking-[0.25em]">{stat.label}</p>
+                  <p className="font-mono text-[9px] text-polka-text/80 mt-1.5 uppercase tracking-[0.25em]">{stat.label}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -308,7 +379,7 @@ function LandingPage() {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="font-mono text-[8px] text-polka-text/30 uppercase tracking-[0.3em]">Scroll</span>
+          <span className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.3em]">Scroll</span>
           <div className="w-px h-8 bg-gradient-to-b from-polka-pink/30 to-transparent" />
         </div>
       </section>
@@ -370,10 +441,10 @@ function LandingPage() {
                     <div className="w-10 h-10 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink group-hover:bg-polka-pink/10 transition-smooth">
                       {f.icon}
                     </div>
-                    <span className="font-mono text-[8px] text-polka-text/30 uppercase tracking-[0.2em]">{f.tag}</span>
+                    <span className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">{f.tag}</span>
                   </div>
                   <h3 className="font-display text-[17px] font-semibold text-white mb-2 tracking-wide">{f.title}</h3>
-                  <p className="text-[13px] text-polka-text/60 leading-relaxed">{f.desc}</p>
+                  <p className="text-[13px] text-polka-text/85 leading-relaxed">{f.desc}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -425,10 +496,10 @@ function LandingPage() {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-polka-text/40">{item.icon}</span>
+                      <span className="text-polka-text/70">{item.icon}</span>
                       <h3 className="font-display text-[17px] font-semibold text-white tracking-wide">{item.title}</h3>
                     </div>
-                    <p className="text-[13px] text-polka-text/60 leading-relaxed mb-3">{item.desc}</p>
+                    <p className="text-[13px] text-polka-text/85 leading-relaxed mb-3">{item.desc}</p>
                     <TypingText text={item.example} speed={25} />
                   </div>
                 </div>
@@ -463,7 +534,7 @@ function LandingPage() {
                     {item.icon}
                   </div>
                   <p className="font-display text-[14px] font-semibold text-white tracking-wide">{item.label}</p>
-                  <p className="font-mono text-[9px] text-polka-text/40 mt-0.5 uppercase tracking-wider">{item.sub}</p>
+                  <p className="font-mono text-[9px] text-polka-text/70 mt-0.5 uppercase tracking-wider">{item.sub}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -487,7 +558,7 @@ function LandingPage() {
           <div className="grid grid-cols-2 gap-4">
             <ScrollReveal delay={0}>
               <div className="p-6 rounded-xl tech-card h-full">
-                <h3 className="font-display text-[15px] font-semibold text-polka-text/50 mb-4 tracking-wide uppercase">Traditional DeFi</h3>
+                <h3 className="font-display text-[15px] font-semibold text-polka-text/80 mb-4 tracking-wide uppercase">Traditional DeFi</h3>
                 <div className="space-y-3">
                   {[
                     "Navigate to DEX manually",
@@ -497,7 +568,7 @@ function LandingPage() {
                     "One action at a time",
                     "No risk management",
                   ].map((item) => (
-                    <div key={item} className="flex items-center gap-2.5 text-[13px] text-polka-text/40">
+                    <div key={item} className="flex items-center gap-2.5 text-[13px] text-polka-text/70">
                       <span className="text-red-400/50 text-[10px]">&#10005;</span> {item}
                     </div>
                   ))}
@@ -536,7 +607,7 @@ function LandingPage() {
           <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4">Start Trading<br /><span className="text-polka-pink">Autonomously</span></h2>
           <p className="text-polka-text mb-8 font-light">Connect your wallet to access the dashboard. No signup. No KYC. Just connect and go.</p>
           <ConnectButton />
-          <p className="font-mono text-[9px] text-polka-text/20 mt-8 uppercase tracking-[0.15em]">Built for the Polkadot Solidity Hackathon 2026 | Track 1: AI-Powered DeFi</p>
+          <p className="font-mono text-[9px] text-polka-text/50 mt-8 uppercase tracking-[0.15em]">Built for the Polkadot Solidity Hackathon 2026 | Track 1: AI-Powered DeFi</p>
         </ScrollReveal>
       </section>
 
@@ -544,10 +615,10 @@ function LandingPage() {
       <footer className="border-t border-polka-border py-8 px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Bot size={14} className="text-polka-text/30" />
-            <span className="font-mono text-[10px] text-polka-text/30 uppercase tracking-[0.15em]">PolkaAgent</span>
+            <Bot size={14} className="text-polka-text/60" />
+            <span className="font-mono text-[10px] text-polka-text/60 uppercase tracking-[0.15em]">PolkaAgent</span>
           </div>
-          <div className="flex items-center gap-5 font-mono text-[9px] text-polka-text/20 uppercase tracking-wider">
+          <div className="flex items-center gap-5 font-mono text-[9px] text-polka-text/50 uppercase tracking-wider">
             <a href="https://faucet.polkadot.io/" target="_blank" rel="noopener noreferrer" className="hover:text-polka-pink transition-smooth">Faucet</a>
             <a href="https://docs.polkadot.com/smart-contracts/overview/" target="_blank" rel="noopener noreferrer" className="hover:text-polka-pink transition-smooth">Polkadot Docs</a>
             <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener noreferrer" className="hover:text-polka-pink transition-smooth">DeepSeek</a>
@@ -651,7 +722,7 @@ function Dashboard({ address }: { address: string }) {
           </div>
           <div className="flex items-baseline gap-1.5">
             <h1 className="font-display text-base font-bold tracking-wider uppercase">Polka<span className="text-polka-pink">Agent</span></h1>
-            <span className="font-mono text-[8px] text-polka-text/30">v1.0</span>
+            <span className="font-mono text-[8px] text-polka-text/60">v1.0</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -662,7 +733,7 @@ function Dashboard({ address }: { address: string }) {
               { href: "/portfolio", icon: <PieChart size={12} />, label: "Portfolio" },
               { href: "/settings", icon: <Settings size={12} />, label: "Settings" },
             ].map(item => (
-              <Link key={item.href} href={item.href} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-[10px] text-polka-text/40 hover:text-polka-pink hover:bg-polka-pink/[0.03] uppercase tracking-wider transition-smooth">{item.icon} {item.label}</Link>
+              <Link key={item.href} href={item.href} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-[10px] text-polka-text/70 hover:text-polka-pink hover:bg-polka-pink/[0.03] uppercase tracking-wider transition-smooth">{item.icon} {item.label}</Link>
             ))}
           </nav>
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-emerald-500/15 bg-emerald-500/[0.03]">
@@ -686,11 +757,11 @@ function Dashboard({ address }: { address: string }) {
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-smooth ${autoTradeEnabled ? "border-emerald-500/20 bg-emerald-500/[0.05]" : "border-polka-border bg-polka-darker"}`}>
-                  {autoTradeEnabled ? <Zap size={18} className="text-emerald-400" /> : <Target size={18} className="text-polka-text/40" />}
+                  {autoTradeEnabled ? <Zap size={18} className="text-emerald-400" /> : <Target size={18} className="text-polka-text/70" />}
                 </div>
                 <div>
                   <h3 className="font-display text-[15px] font-semibold text-white tracking-wide">Continuous Auto-Trade</h3>
-                  <p className="font-mono text-[9px] text-polka-text/40 uppercase tracking-wider">{autoTradeEnabled ? `Active | ${autoTradeStats.total_trades} trades | 60s interval` : "AI monitors signals and trades automatically"}</p>
+                  <p className="font-mono text-[9px] text-polka-text/70 uppercase tracking-wider">{autoTradeEnabled ? `Active | ${autoTradeStats.total_trades} trades | 60s interval` : "AI monitors signals and trades automatically"}</p>
                 </div>
               </div>
               <button onClick={toggleAutoTrade} disabled={autoTradeLoading} className={`relative w-14 h-7 rounded-full transition-smooth ${autoTradeEnabled ? "bg-emerald-500/80" : "bg-polka-border"}`}>
@@ -711,7 +782,7 @@ function Dashboard({ address }: { address: string }) {
                     {isExecuting === s.key ? <Loader2 size={12} className="animate-spin" /> : s.icon}
                   </div>
                   <p className="font-display text-[12px] font-semibold text-white tracking-wide">{s.label}</p>
-                  <p className="font-mono text-[9px] text-polka-text/30 uppercase tracking-wider">{s.sub}</p>
+                  <p className="font-mono text-[9px] text-polka-text/60 uppercase tracking-wider">{s.sub}</p>
                 </button>
               ))}
             </div>
@@ -723,8 +794,8 @@ function Dashboard({ address }: { address: string }) {
           {/* Portfolio */}
           <div className="col-span-12 md:col-span-5 p-5 rounded-xl tech-card">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="tech-label text-polka-text/50">Portfolio</h2>
-              <button onClick={refresh} disabled={portfolioLoading} className="text-polka-text/30 hover:text-polka-pink transition-smooth">
+              <h2 className="tech-label text-polka-text/80">Portfolio</h2>
+              <button onClick={refresh} disabled={portfolioLoading} className="text-polka-text/60 hover:text-polka-pink transition-smooth">
                 <RefreshCw size={12} className={portfolioLoading ? "animate-spin" : ""} />
               </button>
             </div>
@@ -739,7 +810,7 @@ function Dashboard({ address }: { address: string }) {
                       <div className="w-8 h-8 rounded-md border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink font-mono text-[10px] font-bold">{token[0]}</div>
                       <div className="flex-1">
                         <div className="flex justify-between"><span className="font-display text-[13px] font-semibold text-white tracking-wide">{token}</span><span className="font-mono text-[13px] text-white">{formatBalance(String(total))}</span></div>
-                        {parseFloat(agentBal) > 0 && <div className="flex justify-between"><span className="font-mono text-[8px] text-polka-text/25 uppercase tracking-wider">Agent</span><span className="font-mono text-[9px] text-polka-text/35">{formatBalance(agentBal)}</span></div>}
+                        {parseFloat(agentBal) > 0 && <div className="flex justify-between"><span className="font-mono text-[8px] text-polka-text/50 uppercase tracking-wider">Agent</span><span className="font-mono text-[9px] text-polka-text/60">{formatBalance(agentBal)}</span></div>}
                       </div>
                     </div>
                   );
@@ -749,14 +820,14 @@ function Dashboard({ address }: { address: string }) {
                   <div className="pt-2.5 border-t border-polka-border grid grid-cols-2 gap-2">
                     {Object.entries(prices).map(([token, data]: [string, any]) => (
                       <div key={token} className="p-2.5 rounded-lg border border-polka-border bg-polka-darker text-center">
-                        <p className="font-mono text-[7px] text-polka-text/30 uppercase tracking-[0.2em]">PAS/{token}</p>
+                        <p className="font-mono text-[7px] text-polka-text/60 uppercase tracking-[0.2em]">PAS/{token}</p>
                         <p className="num-display text-[16px] text-white mt-0.5">{parseFloat(data.price_in_pas).toFixed(4)}</p>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            ) : <p className="text-polka-text/30 text-sm font-mono">Loading...</p>}
+            ) : <p className="text-polka-text/60 text-sm font-mono">Loading...</p>}
           </div>
         </div>
 
@@ -764,7 +835,7 @@ function Dashboard({ address }: { address: string }) {
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-12 md:col-span-6 p-5 rounded-xl tech-card">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="tech-label text-polka-text/50 flex items-center gap-1.5"><Activity size={10} /> Live Signals</h2>
+              <h2 className="tech-label text-polka-text/80 flex items-center gap-1.5"><Activity size={10} /> Live Signals</h2>
               <Link href="/signals" className="font-mono text-[9px] text-polka-pink/40 hover:text-polka-pink flex items-center gap-1 uppercase tracking-wider transition-smooth">View all <ChevronRight size={10} /></Link>
             </div>
             {signals.length > 0 ? (
@@ -774,17 +845,17 @@ function Dashboard({ address }: { address: string }) {
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className={`font-mono font-bold text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider ${s.signal_type === "BUY" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/15" : "bg-amber-500/10 text-amber-400 border border-amber-500/15"}`}>{s.signal_type}</span>
                       <span className="text-white/70 font-display font-semibold tracking-wide">{s.token}</span>
-                      <span className="font-mono text-polka-text/20 text-[8px] ml-auto uppercase">{s.strength}</span>
+                      <span className="font-mono text-polka-text/50 text-[8px] ml-auto uppercase">{s.strength}</span>
                     </div>
-                    <p className="text-polka-text/40 leading-snug">{s.reason.slice(0, 70)}</p>
+                    <p className="text-polka-text/70 leading-snug">{s.reason.slice(0, 70)}</p>
                   </div>
                 ))}
               </div>
-            ) : <div className="text-center py-8"><Activity size={20} className="mx-auto text-polka-text/10 mb-2" /><p className="font-mono text-polka-text/20 text-[10px] uppercase tracking-wider">No signals. Market stable.</p></div>}
+            ) : <div className="text-center py-8"><Activity size={20} className="mx-auto text-polka-text/30 mb-2" /><p className="font-mono text-polka-text/50 text-[10px] uppercase tracking-wider">No signals. Market stable.</p></div>}
           </div>
 
           <div className="col-span-12 md:col-span-6 p-5 rounded-xl tech-card">
-            <h2 className="tech-label text-polka-text/50 flex items-center gap-1.5 mb-3"><Clock size={10} /> Execution Log</h2>
+            <h2 className="tech-label text-polka-text/80 flex items-center gap-1.5 mb-3"><Clock size={10} /> Execution Log</h2>
             {executions.length > 0 ? (
               <div className="space-y-1.5 max-h-[280px] overflow-y-auto scrollbar-hide">
                 {executions.slice(0, 12).map(exec => (
@@ -794,14 +865,14 @@ function Dashboard({ address }: { address: string }) {
                         {exec.status === "executing" ? <Loader2 size={10} className="text-polka-pink animate-spin" /> : exec.status === "confirmed" ? <Check size={10} className="text-emerald-400" /> : <span className="text-red-400 text-[9px]">!</span>}
                         <span className="text-white/60 font-display font-semibold tracking-wide">{exec.action}</span>
                       </div>
-                      <span className="font-mono text-polka-text/15 text-[7px] tracking-wider">{new Date(exec.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+                      <span className="font-mono text-polka-text/40 text-[7px] tracking-wider">{new Date(exec.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
                     </div>
-                    <p className="text-polka-text/30 text-[10px] mt-0.5">{exec.description}</p>
+                    <p className="text-polka-text/60 text-[10px] mt-0.5">{exec.description}</p>
                     {exec.tx_hash && <a href={`https://blockscout-testnet.polkadot.io/tx/0x${exec.tx_hash}`} target="_blank" rel="noopener noreferrer" className="text-polka-pink/30 hover:text-polka-pink text-[8px] font-mono mt-0.5 flex items-center gap-1 transition-smooth">{exec.tx_hash.slice(0, 12)}... <ExternalLink size={7} /></a>}
                   </div>
                 ))}
               </div>
-            ) : <div className="text-center py-8"><Zap size={20} className="mx-auto text-polka-text/10 mb-2" /><p className="font-mono text-polka-text/20 text-[10px] uppercase tracking-wider">No executions yet</p></div>}
+            ) : <div className="text-center py-8"><Zap size={20} className="mx-auto text-polka-text/30 mb-2" /><p className="font-mono text-polka-text/50 text-[10px] uppercase tracking-wider">No executions yet</p></div>}
           </div>
         </div>
       </div>
@@ -843,7 +914,7 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
         </div>
         <div className="flex-1">
           <h3 className="font-display text-[16px] font-semibold text-white mb-1 tracking-wide">Set Up Your Agent Wallet</h3>
-          <p className="text-[12px] text-polka-text/50 mb-4 leading-relaxed">
+          <p className="text-[12px] text-polka-text/80 mb-4 leading-relaxed">
             Create a smart contract wallet so the AI agent can execute trades autonomously on your behalf.
             Secured by on-chain spending limits.
           </p>
@@ -853,11 +924,11 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
             {["Create Wallet", "Deposit PAS", "Start Trading"].map((label, i) => (
               <div key={label} className="flex items-center gap-2">
                 <div className={`w-6 h-6 rounded-md flex items-center justify-center font-mono text-[9px] font-bold border ${
-                  step > i + 1 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : step === i + 1 ? "bg-polka-pink/10 border-polka-pink/20 text-polka-pink" : "bg-polka-darker border-polka-border text-polka-text/30"
+                  step > i + 1 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : step === i + 1 ? "bg-polka-pink/10 border-polka-pink/20 text-polka-pink" : "bg-polka-darker border-polka-border text-polka-text/60"
                 }`}>
                   {step > i + 1 ? <Check size={10} /> : i + 1}
                 </div>
-                <span className={`font-mono text-[10px] uppercase tracking-wider ${step === i + 1 ? "text-white" : "text-polka-text/30"}`}>{label}</span>
+                <span className={`font-mono text-[10px] uppercase tracking-wider ${step === i + 1 ? "text-white" : "text-polka-text/60"}`}>{label}</span>
                 {i < 2 && <div className="w-6 h-px bg-polka-border" />}
               </div>
             ))}
@@ -885,7 +956,7 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
               <div className="flex items-center gap-2 text-emerald-400 font-mono text-[11px] uppercase tracking-wider">
                 <Check size={14} /> Wallet created!
               </div>
-              <p className="text-[11px] text-polka-text/40">
+              <p className="text-[11px] text-polka-text/70">
                 Send PAS to your Agent Wallet from the <Link href="/settings" className="text-polka-pink hover:underline">Settings</Link> page, or ask the AI: &quot;deposit 10 PAS&quot;
               </p>
             </div>
@@ -901,7 +972,7 @@ function CustomAction({ onExecute, isLoading }: { onExecute: (msg: string) => vo
   return (
     <div className="flex gap-2 mt-3">
       <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && input.trim() && !isLoading) { onExecute(input.trim()); setInput(""); }}}
-        placeholder="Custom command... e.g. 'Swap 50 PAS for USDC'" className="flex-1 px-3 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/20 focus:outline-none focus:border-polka-pink/15 transition-smooth" />
+        placeholder="Custom command... e.g. 'Swap 50 PAS for USDC'" className="flex-1 px-3 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/50 focus:outline-none focus:border-polka-pink/15 transition-smooth" />
       <button onClick={() => { if (input.trim() && !isLoading) { onExecute(input.trim()); setInput(""); }}} disabled={!input.trim() || isLoading}
         className="px-5 py-2.5 rounded-lg border border-polka-pink/20 bg-polka-pink/10 text-polka-pink font-mono text-[11px] font-semibold uppercase tracking-wider disabled:opacity-20 hover:bg-polka-pink/15 transition-smooth">
         {isLoading ? <Loader2 size={14} className="animate-spin" /> : "Execute"}

@@ -232,3 +232,107 @@ input:focus, textarea:focus {
 .scroll-reveal-scale {
   animation: reveal-scale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ── Side border animations (Obscura-style) ── */
+.side-borders {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.side-border-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(230, 0, 122, 0.15) 15%,
+    rgba(230, 0, 122, 0.06) 50%,
+    rgba(230, 0, 122, 0.15) 85%,
+    transparent 100%
+  );
+}
+.side-border-line.left { left: 32px; }
+.side-border-line.right { right: 32px; }
+
+@media (max-width: 768px) {
+  .side-border-line.left { left: 12px; }
+  .side-border-line.right { right: 12px; }
+}
+
+/* Floating particles on side borders */
+@keyframes float-up {
+  0% { transform: translateY(100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-20px); opacity: 0; }
+}
+
+@keyframes float-down {
+  0% { transform: translateY(-20px); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.side-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent-pink);
+  box-shadow: 0 0 6px rgba(230, 0, 122, 0.6), 0 0 12px rgba(230, 0, 122, 0.3);
+}
+
+.side-particle.up {
+  animation: float-up var(--duration, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.side-particle.down {
+  animation: float-down var(--duration, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Glow pulse on the border lines */
+@keyframes line-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.side-border-glow {
+  position: absolute;
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(230, 0, 122, 0.5),
+    transparent
+  );
+  animation: float-up var(--duration, 6s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Corner brackets */
+.corner-bracket {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: rgba(230, 0, 122, 0.2);
+  border-style: solid;
+}
+.corner-bracket.tl { top: 24px; left: 24px; border-width: 1px 0 0 1px; }
+.corner-bracket.tr { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
+.corner-bracket.bl { bottom: 24px; left: 24px; border-width: 0 0 1px 1px; }
+.corner-bracket.br { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
+
+@media (max-width: 768px) {
+  .corner-bracket.tl { top: 8px; left: 4px; }
+  .corner-bracket.tr { top: 8px; right: 4px; }
+  .corner-bracket.bl { bottom: 8px; left: 4px; }
+  .corner-bracket.br { bottom: 8px; right: 4px; }
+}

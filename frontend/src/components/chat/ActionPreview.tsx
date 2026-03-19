@@ -105,7 +105,7 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
         <div className="px-4 py-2 space-y-1.5 border-t border-polka-border/10">
           {displayParams.map(({ k, v }) => (
             <div key={k} className="flex justify-between text-[12px]">
-              <span className="text-polka-text/50 capitalize">{k.replace(/_/g, " ")}</span>
+              <span className="text-polka-text/80 capitalize">{k.replace(/_/g, " ")}</span>
               <span className="text-white/80 font-mono text-[11px]">
                 {v.startsWith("0x") ? `${v.slice(0, 8)}...${v.slice(-6)}` : v}
               </span>
@@ -118,15 +118,15 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
       {action.result?.amount_out ? (
         <div className="mx-4 my-2 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
           <div className="flex justify-between text-[13px]">
-            <span className="text-polka-text/60">You receive</span>
+            <span className="text-polka-text/85">You receive</span>
             <span className="text-emerald-400 font-semibold font-mono">
               ~{formatBalance(String(action.result.amount_out))} {String(action.result.to_token || "")}
             </span>
           </div>
           {action.result.price_impact ? (
             <div className="flex justify-between text-[11px] mt-1">
-              <span className="text-polka-text/40">Price impact</span>
-              <span className="text-polka-text/60">{String(action.result.price_impact)}</span>
+              <span className="text-polka-text/70">Price impact</span>
+              <span className="text-polka-text/85">{String(action.result.price_impact)}</span>
             </div>
           ) : null}
         </div>
@@ -137,7 +137,7 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
         <div className="px-4 py-2 space-y-1 border-t border-polka-border/10">
           {Object.entries(action.result.balances as Record<string, string>).map(([token, bal]) => (
             <div key={token} className="flex justify-between text-[12px]">
-              <span className="text-polka-text/50">{token}</span>
+              <span className="text-polka-text/80">{token}</span>
               <span className="text-white/80 font-mono">{formatBalance(bal)}</span>
             </div>
           ))}
@@ -156,9 +156,9 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
                   {signal.signal_type}
                 </span>
                 <span className="text-white/80 font-medium">{signal.token}</span>
-                <span className="text-polka-text/40">({signal.strength})</span>
+                <span className="text-polka-text/70">({signal.strength})</span>
               </div>
-              <p className="text-polka-text/60 leading-snug">{signal.reason}</p>
+              <p className="text-polka-text/85 leading-snug">{signal.reason}</p>
             </div>
           ))}
         </div>
@@ -167,7 +167,7 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
       {/* Executed trades display */}
       {action.result?.executed_trades ? (
         <div className="px-4 py-2 space-y-2 border-t border-polka-border/10">
-          <p className="text-[10px] font-medium text-polka-text/40 uppercase tracking-wider">Executed Trades</p>
+          <p className="text-[10px] font-medium text-polka-text/70 uppercase tracking-wider">Executed Trades</p>
           {(action.result.executed_trades as Array<Record<string, any>>).map((trade, i) => (
             <div key={i} className="p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/10 text-[11px]">
               <div className="flex items-center justify-between">
@@ -235,7 +235,7 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
           </button>
           <button
             onClick={() => { setStatus("rejected"); onReject?.(); }}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-polka-border/30 text-polka-text/60 text-[12px] font-medium hover:text-red-400 hover:border-red-500/30 transition-smooth"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-polka-border/30 text-polka-text/85 text-[12px] font-medium hover:text-red-400 hover:border-red-500/30 transition-smooth"
           >
             <X size={14} /> Reject
           </button>
@@ -245,13 +245,13 @@ export function ActionPreview({ action, onConfirm, onReject }: ActionPreviewProp
       {status === "confirming" && (
         <div className="flex items-center justify-center gap-2 px-4 py-3 border-t border-polka-border/10">
           <Loader2 size={14} className="animate-spin text-polka-pink" />
-          <span className="text-[12px] text-polka-text/60">Waiting for wallet...</span>
+          <span className="text-[12px] text-polka-text/85">Waiting for wallet...</span>
         </div>
       )}
 
       {action.description ? (
         <div className="px-4 py-2 border-t border-polka-border/10">
-          <p className="text-[11px] text-polka-text/40">{action.description}</p>
+          <p className="text-[11px] text-polka-text/70">{action.description}</p>
         </div>
       ) : null}
     </div>

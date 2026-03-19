@@ -48,14 +48,14 @@ export function ChatInput({ onSend, isLoading, disabled }: ChatInputProps) {
             disabled={disabled || isLoading}
             rows={1}
             className="w-full px-4 py-3.5 pr-12 rounded-2xl bg-white/[0.04] border border-polka-border/20
-              text-white placeholder-polka-text/30 resize-none
+              text-white placeholder-polka-text/60 resize-none
               focus:outline-none focus:border-polka-pink/30
               disabled:opacity-30 transition-smooth text-[14px] leading-relaxed"
             style={{ minHeight: "52px", maxHeight: "120px" }}
           />
           {!disabled && !isLoading && (
             <div className="absolute right-3 bottom-3">
-              <Sparkles size={14} className="text-polka-text/20" />
+              <Sparkles size={14} className="text-polka-text/50" />
             </div>
           )}
         </div>

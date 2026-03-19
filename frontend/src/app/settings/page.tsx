@@ -111,7 +111,7 @@ export default function SettingsPage() {
           </Link>
           <div>
             <h1 className="font-display text-lg font-bold text-white tracking-wide">Agent Settings</h1>
-            <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-[0.2em]">Manage AI Agent Permissions</p>
+            <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-[0.2em]">Manage AI Agent Permissions</p>
           </div>
         </div>
         <ConnectButton />
@@ -126,13 +126,13 @@ export default function SettingsPage() {
             </div>
             <div>
               <h2 className="font-display text-white font-semibold tracking-wide">Agent Wallet</h2>
-              <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">
+              <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-wider">
                 {agentWallet ? "Active and authorized" : "No agent wallet created yet"}
               </p>
             </div>
           </div>
           {agentWallet && (
-            <div className="p-3 rounded-lg border border-polka-border bg-polka-darker font-mono text-[10px] text-polka-text/50 break-all tracking-wider">
+            <div className="p-3 rounded-lg border border-polka-border bg-polka-darker font-mono text-[10px] text-polka-text/80 break-all tracking-wider">
               {agentWallet}
             </div>
           )}
@@ -145,17 +145,17 @@ export default function SettingsPage() {
               <Bot size={18} className="text-polka-pink" />
               <h3 className="font-display text-white font-semibold tracking-wide">Create Agent Wallet</h3>
             </div>
-            <p className="text-[13px] text-polka-text/50 leading-relaxed">
+            <p className="text-[13px] text-polka-text/80 leading-relaxed">
               Create a smart contract wallet and authorize the AI agent to execute transactions on your behalf.
             </p>
             <div>
-              <label className="font-mono text-[8px] text-polka-text/40 mb-1.5 block uppercase tracking-wider">Agent Address</label>
+              <label className="font-mono text-[8px] text-polka-text/70 mb-1.5 block uppercase tracking-wider">Agent Address</label>
               <input
                 type="text"
                 value={agentAddress}
                 onChange={(e) => setAgentAddress(e.target.value)}
                 placeholder="0x... (backend agent address)"
-                className="w-full px-4 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/20 focus:outline-none focus:border-polka-pink/15 tracking-wider"
+                className="w-full px-4 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/50 focus:outline-none focus:border-polka-pink/15 tracking-wider"
               />
             </div>
             <button
@@ -178,7 +178,7 @@ export default function SettingsPage() {
                 <DollarSign size={18} className="text-yellow-400" />
                 <h3 className="font-display text-white font-semibold tracking-wide">Daily Spending Limit</h3>
               </div>
-              <p className="text-[13px] text-polka-text/50 leading-relaxed">
+              <p className="text-[13px] text-polka-text/80 leading-relaxed">
                 Set maximum PAS the agent can spend per day.
               </p>
               <div className="flex gap-2">
@@ -187,7 +187,7 @@ export default function SettingsPage() {
                   value={dailyLimitPAS}
                   onChange={(e) => setDailyLimitPAS(e.target.value)}
                   placeholder="e.g. 100"
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/20 focus:outline-none focus:border-polka-pink/15 tracking-wider"
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/50 focus:outline-none focus:border-polka-pink/15 tracking-wider"
                 />
                 <button
                   onClick={setLimit}
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                 <Check size={18} className="text-emerald-400" />
                 <h3 className="font-display text-white font-semibold tracking-wide">Allowlist Contract</h3>
               </div>
-              <p className="text-[13px] text-polka-text/50 leading-relaxed">
+              <p className="text-[13px] text-polka-text/80 leading-relaxed">
                 Add a contract address the agent is allowed to interact with.
               </p>
               <div className="flex gap-2">
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                   value={targetAddress}
                   onChange={(e) => setTargetAddress(e.target.value)}
                   placeholder="0x... contract address"
-                  className="flex-1 px-4 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/20 focus:outline-none focus:border-polka-pink/15 tracking-wider"
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/50 focus:outline-none focus:border-polka-pink/15 tracking-wider"
                 />
                 <button
                   onClick={allowlistTarget}

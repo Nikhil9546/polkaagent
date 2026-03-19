@@ -60,7 +60,7 @@ export default function PortfolioPage() {
           </Link>
           <div>
             <h1 className="font-display text-lg font-bold text-white tracking-wide">Portfolio</h1>
-            <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-[0.2em]">Polkadot Hub TestNet</p>
+            <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-[0.2em]">Polkadot Hub TestNet</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -80,12 +80,12 @@ export default function PortfolioPage() {
         <div className="relative overflow-hidden rounded-xl tech-card corner-accents p-8">
           <div className="absolute top-0 right-0 w-64 h-64 bg-polka-pink/[0.03] rounded-full blur-[100px]" />
           <div className="relative">
-            <p className="tech-label text-polka-text/50 mb-2">Total Balance</p>
+            <p className="tech-label text-polka-text/80 mb-2">Total Balance</p>
             <h2 className="num-display text-4xl text-white mb-1">
               {formatBalance(nativeBalance?.formatted || "0", 4)} <span className="text-2xl text-polka-text">PAS</span>
             </h2>
             <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-2 font-mono text-[10px] text-polka-text/40 uppercase tracking-wider">
+              <div className="flex items-center gap-2 font-mono text-[10px] text-polka-text/70 uppercase tracking-wider">
                 <Wallet size={12} />
                 <span>{shortenAddress(address!, 6)}</span>
               </div>
@@ -108,7 +108,7 @@ export default function PortfolioPage() {
               className={`flex-1 py-2.5 px-4 rounded-md font-mono text-[10px] font-medium transition-all uppercase tracking-wider
                 ${activeTab === tab
                   ? "bg-polka-pink/10 text-polka-pink border border-polka-pink/15"
-                  : "text-polka-text/40 hover:text-white border border-transparent"
+                  : "text-polka-text/70 hover:text-white border border-transparent"
                 }`}
             >
               {tab === "tokens" && <span className="flex items-center justify-center gap-1.5"><Wallet size={12} /> Tokens</span>}
@@ -146,7 +146,7 @@ export default function PortfolioPage() {
                       </div>
                       <div>
                         <h3 className="font-display text-white font-semibold tracking-wide">{lp.pair || "PAS/USDT"}</h3>
-                        <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">Uniswap V2 LP</p>
+                        <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-wider">Uniswap V2 LP</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -155,11 +155,11 @@ export default function PortfolioPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 rounded-lg border border-polka-border bg-polka-darker">
-                      <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider mb-1">PAS Pooled</p>
+                      <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-wider mb-1">PAS Pooled</p>
                       <p className="font-mono text-white text-sm">{formatBalance(lp.reserve_pas || "0")}</p>
                     </div>
                     <div className="p-3 rounded-lg border border-polka-border bg-polka-darker">
-                      <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider mb-1">Token Pooled</p>
+                      <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-wider mb-1">Token Pooled</p>
                       <p className="font-mono text-white text-sm">{formatBalance(Object.values(lp).find((v) => v !== lp.pair && v !== lp.pair_address && v !== lp.reserve_pas) as string || "0")}</p>
                     </div>
                   </div>
@@ -167,9 +167,9 @@ export default function PortfolioPage() {
               ))
             ) : (
               <div className="text-center py-16">
-                <Droplets size={40} className="mx-auto text-polka-text/10 mb-4" />
+                <Droplets size={40} className="mx-auto text-polka-text/30 mb-4" />
                 <h3 className="font-display text-white font-semibold mb-2 tracking-wide">No Liquidity Positions</h3>
-                <p className="font-mono text-polka-text/40 text-[10px] uppercase tracking-wider mb-4">Add liquidity to earn trading fees</p>
+                <p className="font-mono text-polka-text/70 text-[10px] uppercase tracking-wider mb-4">Add liquidity to earn trading fees</p>
                 <Link href="/" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-polka-border bg-polka-card text-polka-text hover:text-polka-pink font-mono text-[10px] uppercase tracking-wider transition-all">
                   <ArrowRightLeft size={12} /> Go to Chat
                 </Link>
@@ -181,9 +181,9 @@ export default function PortfolioPage() {
         {/* Transaction History */}
         {activeTab === "history" && (
           <div className="text-center py-16">
-            <Clock size={40} className="mx-auto text-polka-text/10 mb-4" />
+            <Clock size={40} className="mx-auto text-polka-text/30 mb-4" />
             <h3 className="font-display text-white font-semibold mb-2 tracking-wide">Transaction History</h3>
-            <p className="font-mono text-polka-text/40 text-[10px] uppercase tracking-wider mb-4">
+            <p className="font-mono text-polka-text/70 text-[10px] uppercase tracking-wider mb-4">
               View your transactions on the block explorer
             </p>
             <a
@@ -222,15 +222,15 @@ function TokenRow({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-display text-white font-semibold tracking-wide">{symbol}</h3>
-            <p className="font-mono text-[8px] text-polka-text/40 uppercase tracking-wider">
+            <p className="font-mono text-[8px] text-polka-text/70 uppercase tracking-wider">
               {symbol === "PAS" ? "Polkadot Hub" : symbol === "USDT" ? "Tether USD" : "USD Coin"}
             </p>
           </div>
           <div className="text-right">
             <p className="font-mono text-white font-semibold">{formatBalance(String(total))}</p>
             {parseFloat(agentBalance) > 0 && (
-              <p className="font-mono text-[9px] text-polka-text/40 mt-0.5">
-                <span className="text-polka-text/30">Wallet:</span> {formatBalance(walletBalance)} &middot;{" "}
+              <p className="font-mono text-[9px] text-polka-text/70 mt-0.5">
+                <span className="text-polka-text/60">Wallet:</span> {formatBalance(walletBalance)} &middot;{" "}
                 <span className="text-emerald-400/50">Agent:</span> {formatBalance(agentBalance)}
               </p>
             )}
