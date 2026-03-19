@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import {
   Bot,
@@ -59,12 +59,9 @@ export default function Home() {
 
   if (!mounted) {
     return (
-      <div className="flex items-center justify-center h-screen bg-polka-dark grid-bg">
-        <div className="text-center">
-          <div className="w-14 h-14 rounded-lg border border-polka-pink/20 bg-polka-card flex items-center justify-center animate-pulse mx-auto mb-4">
-            <Bot size={28} className="text-polka-pink" />
-          </div>
-          <p className="font-mono text-[10px] text-polka-text uppercase tracking-[0.3em]">Initializing...</p>
+      <div className="flex items-center justify-center h-screen gradient-bg">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-polka-pink to-polka-purple flex items-center justify-center animate-pulse shadow-2xl shadow-polka-pink/30">
+          <Bot size={28} className="text-white" />
         </div>
       </div>
     );
@@ -72,215 +69,6 @@ export default function Home() {
 
   if (!isConnected) return <LandingPage />;
   return <Dashboard address={address!} />;
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  SCROLL REVEAL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-function ScrollReveal({ children, delay = 0, className = "", scale = false }: {
-  children: React.ReactNode; delay?: number; className?: string; scale?: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
-      { threshold: 0.15 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={`${visible ? (scale ? "scroll-reveal-scale" : "scroll-reveal") : "scroll-hidden"} ${className}`}
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  TYPING TEXT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-function TypingText({ text, speed = 30 }: { text: string; speed?: number }) {
-  const [displayed, setDisplayed] = useState("");
-  const [started, setStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!started) return;
-    setDisplayed("");
-    let i = 0;
-    const timer = setInterval(() => {
-      i++;
-      setDisplayed(text.slice(0, i));
-      if (i >= text.length) clearInterval(timer);
-    }, speed);
-    return () => clearInterval(timer);
-  }, [started, text, speed]);
-
-  return (
-    <div ref={ref} className="px-3 py-2 rounded-lg border border-polka-border bg-polka-darker text-[11px] text-polka-text/80 font-mono min-h-[36px]">
-      {started ? (
-        <>
-          {displayed}
-          {displayed.length < text.length && (
-            <span className="inline-block w-[6px] h-[13px] bg-polka-pink/60 ml-[1px] align-middle animate-pulse" />
-          )}
-        </>
-      ) : (
-        <span className="opacity-0">{text}</span>
-      )}
-    </div>
-  );
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  FLOW DIAGRAM (animated steps)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-const flowSteps = [
-  { label: "Signal Detected", sub: "DEX pool analysis" },
-  { label: "AI Analyzes", sub: "DeepSeek V3" },
-  { label: "Validates", sub: "Balance + limits" },
-  { label: "Executes", sub: "Agent signs tx" },
-  { label: "Confirmed", sub: "On Polkadot Hub" },
-];
-
-function FlowDiagram() {
-  const [activeStep, setActiveStep] = useState(-1);
-  const [started, setStarted] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
-      { threshold: 0.5 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!started) return;
-    let i = -1;
-    const timer = setInterval(() => {
-      i++;
-      setActiveStep(i);
-      if (i >= flowSteps.length - 1) clearInterval(timer);
-    }, 400);
-    return () => clearInterval(timer);
-  }, [started]);
-
-  return (
-    <div ref={ref} className="flex items-center justify-between overflow-x-auto gap-2">
-      {flowSteps.map((step, i) => (
-        <div key={step.label} className="flex items-center gap-3 flex-shrink-0">
-          <div className={`text-center transition-all duration-500 ${i <= activeStep ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-            <div className={`w-12 h-12 rounded-lg border flex items-center justify-center font-display text-lg font-bold mx-auto mb-2 transition-all duration-500 ${
-              i <= activeStep ? "border-polka-pink/30 bg-polka-pink/10 text-polka-pink" : "border-polka-pink/15 bg-polka-pink/[0.05] text-polka-pink/30"
-            }`}>
-              {i + 1}
-            </div>
-            <p className="font-display text-[12px] font-semibold text-white tracking-wide">{step.label}</p>
-            <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-wider">{step.sub}</p>
-          </div>
-          {i < 4 && (
-            <ArrowRight size={14} className={`flex-shrink-0 mt-[-16px] transition-all duration-300 ${i < activeStep ? "text-polka-pink/40" : "text-polka-pink/10"}`} />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  SIDE BORDERS (Obscura-style animated edges)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-function SideBorders() {
-  const particles = [
-    // Left side — going up
-    { side: "left", dir: "up", duration: 7, delay: 0 },
-    { side: "left", dir: "up", duration: 9, delay: 2.5 },
-    { side: "left", dir: "up", duration: 11, delay: 5 },
-    { side: "left", dir: "down", duration: 8, delay: 1 },
-    { side: "left", dir: "down", duration: 10, delay: 4 },
-    // Right side — going down
-    { side: "right", dir: "down", duration: 8, delay: 0.5 },
-    { side: "right", dir: "down", duration: 10, delay: 3 },
-    { side: "right", dir: "down", duration: 12, delay: 6 },
-    { side: "right", dir: "up", duration: 7, delay: 2 },
-    { side: "right", dir: "up", duration: 9, delay: 4.5 },
-  ];
-
-  const glows = [
-    { side: "left", duration: 6, delay: 0 },
-    { side: "left", duration: 8, delay: 3 },
-    { side: "right", duration: 7, delay: 1.5 },
-    { side: "right", duration: 9, delay: 4.5 },
-  ];
-
-  return (
-    <div className="side-borders">
-      {/* Vertical lines */}
-      <div className="side-border-line left" />
-      <div className="side-border-line right" />
-
-      {/* Corner brackets */}
-      <div className="corner-bracket tl" />
-      <div className="corner-bracket tr" />
-      <div className="corner-bracket bl" />
-      <div className="corner-bracket br" />
-
-      {/* Floating particles */}
-      {particles.map((p, i) => (
-        <div
-          key={`p-${i}`}
-          className={`side-particle ${p.dir}`}
-          style={{
-            [p.side]: p.side === "left" ? "31px" : "31px",
-            ["--duration" as string]: `${p.duration}s`,
-            ["--delay" as string]: `${p.delay}s`,
-          }}
-        />
-      ))}
-
-      {/* Glow streaks */}
-      {glows.map((g, i) => (
-        <div
-          key={`g-${i}`}
-          className="side-border-glow"
-          style={{
-            [g.side]: g.side === "left" ? "32px" : "32px",
-            ["--duration" as string]: `${g.duration}s`,
-            ["--delay" as string]: `${g.delay}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -296,31 +84,22 @@ function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-polka-dark text-white overflow-hidden scanlines">
-      {/* Grid background */}
-      <div className="fixed inset-0 grid-bg pointer-events-none" />
-
-      {/* Animated side borders */}
-      <SideBorders />
-
+    <div className="min-h-screen bg-[#06060e] text-white overflow-hidden">
       {/* Nav */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? "glass border-b border-polka-pink/[0.06]" : ""}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrollY > 50 ? "glass border-b border-white/[0.04]" : ""}`}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg border border-polka-pink/20 bg-polka-card flex items-center justify-center">
-              <Bot size={16} className="text-polka-pink" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-polka-pink to-polka-purple flex items-center justify-center shadow-lg shadow-polka-pink/25">
+              <Bot size={18} className="text-white" />
             </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-display text-lg font-bold tracking-wider uppercase">
-                Polka<span className="text-polka-pink">Agent</span>
-              </span>
-              <span className="font-mono text-[9px] text-polka-text/70">v1.0</span>
-            </div>
+            <span className="text-lg font-bold tracking-tight">
+              Polka<span className="text-transparent bg-clip-text bg-gradient-to-r from-polka-pink to-polka-purple">Agent</span>
+            </span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="#features" className="font-mono text-[10px] text-polka-text/70 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">Features</a>
-            <a href="#how-it-works" className="font-mono text-[10px] text-polka-text/70 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">How it Works</a>
-            <a href="#architecture" className="font-mono text-[10px] text-polka-text/70 hover:text-polka-pink uppercase tracking-[0.15em] transition-smooth hidden md:block">Architecture</a>
+            <a href="#features" className="text-[13px] text-white/40 hover:text-white transition-smooth hidden md:block">Features</a>
+            <a href="#how-it-works" className="text-[13px] text-white/40 hover:text-white transition-smooth hidden md:block">How it Works</a>
+            <a href="#architecture" className="text-[13px] text-white/40 hover:text-white transition-smooth hidden md:block">Architecture</a>
             <ConnectButton />
           </div>
         </div>
@@ -330,180 +109,181 @@ function LandingPage() {
       <section className="relative min-h-screen flex items-center justify-center px-6">
         {/* Background effects */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/3 left-1/3 w-[500px] h-[500px] bg-polka-pink/[0.04] rounded-full blur-[150px]" />
-          <div className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-polka-purple/[0.04] rounded-full blur-[150px]" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-polka-pink/8 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-polka-purple/8 rounded-full blur-[120px]" />
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)",
+            backgroundSize: "40px 40px",
+          }} />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] mb-8">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot" />
-            <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">Autonomous DeFi Agent</span>
+            <span className="text-[11px] text-white/50 tracking-wide">Live on Polkadot Hub TestNet</span>
           </div>
 
-          <h1 className="font-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
             <span className="text-white">Your Autonomous</span>
             <br />
-            <span className="text-polka-pink">AI DeFi Agent.</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-polka-pink via-purple-400 to-polka-purple">AI DeFi Agent</span>
           </h1>
 
-          <p className="text-base md:text-lg text-polka-text max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+          <p className="text-lg md:text-xl text-white/40 max-w-2xl mx-auto mb-10 leading-relaxed">
             PolkaAgent monitors markets, detects trading signals, and executes trades on Polkadot Hub
-            <span className="text-white/70 font-medium"> autonomously</span> &mdash;
+            <span className="text-white/60 font-medium"> autonomously</span> &mdash;
             all secured by on-chain smart contract guardrails.
           </p>
 
           <div className="flex items-center justify-center gap-4 mb-16">
             <ConnectButton />
-            <a href="#how-it-works" className="flex items-center gap-2 px-6 py-3 rounded-lg border border-polka-border text-[13px] font-mono text-polka-text uppercase tracking-wider hover:text-white hover:border-polka-pink/20 transition-smooth">
-              Learn More <ChevronDown size={14} />
+            <a href="#how-it-works" className="flex items-center gap-2 px-6 py-3 rounded-xl border border-white/[0.08] text-[14px] text-white/60 hover:text-white hover:border-white/20 transition-smooth">
+              See how it works <ChevronDown size={14} />
             </a>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-lg mx-auto">
+          <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
             {[
               { value: "100%", label: "On-Chain" },
               { value: "< 2s", label: "Execution" },
               { value: "24/7", label: "Monitoring" },
-            ].map((stat, i) => (
-              <ScrollReveal key={stat.label} delay={i * 150} scale>
-                <div className="text-center p-4 rounded-lg border border-polka-border bg-polka-card/30">
-                  <p className="num-display text-3xl md:text-4xl text-polka-pink">{stat.value}</p>
-                  <p className="font-mono text-[9px] text-polka-text/80 mt-1.5 uppercase tracking-[0.25em]">{stat.label}</p>
-                </div>
-              </ScrollReveal>
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-polka-pink to-polka-purple">{stat.value}</p>
+                <p className="text-[11px] text-white/30 mt-1 tracking-wider uppercase">{stat.label}</p>
+              </div>
             ))}
           </div>
         </div>
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.3em]">Scroll</span>
-          <div className="w-px h-8 bg-gradient-to-b from-polka-pink/30 to-transparent" />
+          <div className="w-5 h-8 rounded-full border border-white/10 flex justify-center pt-1.5">
+            <div className="w-1 h-2 rounded-full bg-white/30 animate-bounce" />
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="py-28 px-6 relative">
+      <section id="features" className="py-28 px-6">
         <div className="max-w-6xl mx-auto">
-          <ScrollReveal className="mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-5">
-              <Zap size={12} className="text-polka-pink" />
-              <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">Features</span>
-            </div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Not Just Another<br />DeFi Dashboard</h2>
-            <p className="text-polka-text mt-3 max-w-md font-light">PolkaAgent doesn&apos;t just show you data. It acts on it.</p>
-          </ScrollReveal>
+          <div className="text-center mb-16">
+            <p className="text-[11px] text-polka-pink font-medium tracking-[0.25em] uppercase mb-3">Features</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Not just another DeFi dashboard</h2>
+            <p className="text-white/30 mt-3 max-w-md mx-auto">PolkaAgent doesn&apos;t just show you data. It acts on it.</p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
-                icon: <Zap size={20} />,
+                icon: <Zap size={22} />,
                 title: "Autonomous Execution",
-                desc: "The AI signs and broadcasts transactions through your Agent Wallet. No manual signing, no MetaMask popups.",
+                desc: "The AI signs and broadcasts transactions through your Agent Wallet. No manual signing, no MetaMask popups. Just results.",
+                gradient: "from-polka-pink to-rose-500",
                 tag: "Core",
               },
               {
-                icon: <TrendingUp size={20} />,
+                icon: <TrendingUp size={22} />,
                 title: "Live Trading Signals",
-                desc: "Real-time analysis of DEX pools: arbitrage detection, price movements, pool imbalances.",
+                desc: "Real-time analysis of DEX pools: arbitrage detection, price movements, pool imbalances. Signals you can act on instantly.",
+                gradient: "from-amber-500 to-orange-500",
                 tag: "Analysis",
               },
               {
-                icon: <Target size={20} />,
+                icon: <Target size={22} />,
                 title: "Continuous Auto-Trading",
-                desc: "Toggle on. The agent monitors signals every 60 seconds and executes trades automatically.",
+                desc: "Flip a switch. The agent monitors signals every 60 seconds and executes trades automatically when opportunities appear.",
+                gradient: "from-emerald-500 to-cyan-500",
                 tag: "Automation",
               },
               {
-                icon: <Shield size={20} />,
+                icon: <Shield size={22} />,
                 title: "On-Chain Guardrails",
-                desc: "Smart contract enforced daily spending limits, contract allowlists, and emergency pause.",
+                desc: "Smart contract enforced daily spending limits, contract allowlists, and emergency pause. You stay in control even when the AI trades.",
+                gradient: "from-blue-500 to-indigo-500",
                 tag: "Security",
               },
               {
-                icon: <Layers size={20} />,
+                icon: <Layers size={22} />,
                 title: "Multi-Step Strategies",
-                desc: "\"Diversify my portfolio\" — the AI splits your PAS across USDT and USDC in a single command.",
+                desc: "\"Diversify my portfolio\" — the AI splits your PAS across USDT and USDC in a single command, executing multiple swaps.",
+                gradient: "from-violet-500 to-purple-500",
                 tag: "Strategy",
               },
               {
-                icon: <Cpu size={20} />,
+                icon: <Cpu size={22} />,
                 title: "DeepSeek AI Engine",
-                desc: "Powered by DeepSeek V3 with function calling. The AI reasons about your intent and executes.",
+                desc: "Powered by DeepSeek V3 with function calling. The AI reasons about your intent, validates against chain state, and executes.",
+                gradient: "from-polka-purple to-pink-500",
                 tag: "Intelligence",
               },
-            ].map((f, i) => (
-              <ScrollReveal key={f.title} delay={i * 100} scale>
-                <div className="group p-6 rounded-xl tech-card corner-accents card-shine h-full">
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-10 h-10 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink group-hover:bg-polka-pink/10 transition-smooth">
-                      {f.icon}
-                    </div>
-                    <span className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">{f.tag}</span>
+            ].map((f) => (
+              <div key={f.title} className="group p-6 rounded-2xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-smooth card-shine">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${f.gradient} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-smooth`}>
+                    {f.icon}
                   </div>
-                  <h3 className="font-display text-[17px] font-semibold text-white mb-2 tracking-wide">{f.title}</h3>
-                  <p className="text-[13px] text-polka-text/85 leading-relaxed">{f.desc}</p>
+                  <span className="text-[9px] text-white/20 uppercase tracking-wider font-medium">{f.tag}</span>
                 </div>
-              </ScrollReveal>
+                <h3 className="text-[15px] font-semibold text-white mb-2">{f.title}</h3>
+                <p className="text-[13px] text-white/30 leading-relaxed">{f.desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="py-28 px-6">
+      <section id="how-it-works" className="py-28 px-6 bg-white/[0.01]">
         <div className="max-w-4xl mx-auto">
-          <ScrollReveal className="mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-5">
-              <Activity size={12} className="text-polka-pink" />
-              <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">How it Works</span>
-            </div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Three Modes of<br />Operation</h2>
-          </ScrollReveal>
+          <div className="text-center mb-16">
+            <p className="text-[11px] text-polka-pink font-medium tracking-[0.25em] uppercase mb-3">How it Works</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Three modes of operation</h2>
+          </div>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             {[
               {
                 step: "01",
                 title: "One-Click Actions",
-                desc: "Pre-built strategies like Quick Swap, Diversify, or Trade Now. Click a button — the AI executes the entire flow autonomously.",
-                icon: <Zap size={18} />,
-                example: "Click \"Quick Swap\" -> AI swaps 10 PAS for USDT -> Done in 2 seconds",
+                desc: "Pre-built strategies like Quick Swap, Diversify, or Trade Now. Click a button — the AI executes the entire flow autonomously and shows you the transaction hash.",
+                icon: <Zap size={20} />,
+                example: "Click \"Quick Swap\" → AI swaps 10 PAS for USDT → Done in 2 seconds",
               },
               {
                 step: "02",
                 title: "Custom Commands",
-                desc: "Type any DeFi action in plain English. The AI parses your intent, validates against your portfolio, and executes.",
-                icon: <Bot size={18} />,
-                example: "\"Swap 50 PAS for USDT and 50 PAS for USDC\" -> 2 autonomous swaps",
+                desc: "Type any DeFi action in plain English. The AI parses your intent, validates against your portfolio, and executes. Multiple actions from a single command.",
+                icon: <Bot size={20} />,
+                example: "\"Swap 50 PAS for USDT and 50 PAS for USDC\" → 2 autonomous swaps",
               },
               {
                 step: "03",
                 title: "Continuous Auto-Trading",
-                desc: "Toggle auto-trade ON. The agent monitors DEX pools every 60 seconds, detects arbitrage, and trades within your risk limits.",
-                icon: <Activity size={18} />,
-                example: "Toggle ON -> AI detects 4% arbitrage -> Swaps 3.8 PAS -> Confirmed on-chain",
+                desc: "Toggle auto-trade ON. The agent monitors DEX pools every 60 seconds, detects arbitrage and price opportunities, and trades automatically within your risk limits.",
+                icon: <Activity size={20} />,
+                example: "Toggle ON → AI detects 4% arbitrage → Swaps 3.8 PAS → Confirmed on-chain",
               },
-            ].map((item, i) => (
-              <ScrollReveal key={item.step} delay={i * 200}>
-                <div className="flex gap-6 p-6 rounded-xl tech-card group">
-                  <div className="flex-shrink-0">
-                    <div className="w-12 h-12 rounded-lg border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center font-display text-polka-pink font-bold text-lg group-hover:bg-polka-pink/10 group-hover:border-polka-pink/30 transition-smooth">
-                      {item.step}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-polka-text/70">{item.icon}</span>
-                      <h3 className="font-display text-[17px] font-semibold text-white tracking-wide">{item.title}</h3>
-                    </div>
-                    <p className="text-[13px] text-polka-text/85 leading-relaxed mb-3">{item.desc}</p>
-                    <TypingText text={item.example} speed={25} />
+            ].map((item) => (
+              <div key={item.step} className="flex gap-6 p-6 rounded-2xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-smooth group">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-polka-pink/20 to-polka-purple/20 flex items-center justify-center text-polka-pink font-bold text-lg group-hover:from-polka-pink group-hover:to-polka-purple group-hover:text-white transition-smooth">
+                    {item.step}
                   </div>
                 </div>
-              </ScrollReveal>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-white/40">{item.icon}</span>
+                    <h3 className="text-[16px] font-semibold text-white">{item.title}</h3>
+                  </div>
+                  <p className="text-[13px] text-white/30 leading-relaxed mb-3">{item.desc}</p>
+                  <div className="px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] text-[11px] text-white/40 font-mono">
+                    {item.example}
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -512,116 +292,124 @@ function LandingPage() {
       {/* Architecture */}
       <section id="architecture" className="py-28 px-6">
         <div className="max-w-5xl mx-auto">
-          <ScrollReveal className="mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg border border-polka-pink/10 bg-polka-pink/[0.03] mb-5">
-              <Cpu size={12} className="text-polka-pink" />
-              <span className="font-mono text-[10px] text-polka-pink/70 uppercase tracking-[0.2em]">Architecture</span>
-            </div>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">Built on Real<br />Infrastructure</h2>
-            <p className="text-polka-text mt-3 font-light">Every transaction is real. Every contract is deployed. Nothing is simulated.</p>
-          </ScrollReveal>
+          <div className="text-center mb-16">
+            <p className="text-[11px] text-polka-pink font-medium tracking-[0.25em] uppercase mb-3">Architecture</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Built on real infrastructure</h2>
+            <p className="text-white/30 mt-3">Every transaction is real. Every contract is deployed. Nothing is simulated.</p>
+          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               { icon: <Globe size={18} />, label: "Polkadot Hub", sub: "Chain ID 420420417" },
               { icon: <Cpu size={18} />, label: "DeepSeek V3", sub: "AI Engine" },
               { icon: <ArrowRightLeft size={18} />, label: "PolkaSwap DEX", sub: "Real AMM" },
               { icon: <Lock size={18} />, label: "AgentWallet", sub: "Smart Contract" },
-            ].map((item, i) => (
-              <ScrollReveal key={item.label} delay={i * 120} scale>
-                <div className="p-4 rounded-xl tech-card text-center h-full">
-                  <div className="w-10 h-10 rounded-lg border border-polka-border bg-polka-darker flex items-center justify-center text-polka-pink mx-auto mb-3">
-                    {item.icon}
-                  </div>
-                  <p className="font-display text-[14px] font-semibold text-white tracking-wide">{item.label}</p>
-                  <p className="font-mono text-[9px] text-polka-text/70 mt-0.5 uppercase tracking-wider">{item.sub}</p>
+            ].map((item) => (
+              <div key={item.label} className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] text-center">
+                <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center text-white/40 mx-auto mb-2">
+                  {item.icon}
                 </div>
-              </ScrollReveal>
+                <p className="text-[13px] font-medium text-white">{item.label}</p>
+                <p className="text-[10px] text-white/25 mt-0.5">{item.sub}</p>
+              </div>
             ))}
           </div>
 
           {/* Flow diagram */}
-          <ScrollReveal>
-            <div className="p-6 rounded-xl tech-card">
-              <FlowDiagram />
+          <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="flex items-center justify-between overflow-x-auto gap-2">
+              {[
+                { label: "Signal Detected", sub: "DEX pool analysis", color: "from-amber-500 to-orange-500" },
+                { label: "AI Analyzes", sub: "DeepSeek V3", color: "from-polka-purple to-violet-500" },
+                { label: "Validates", sub: "Balance + limits", color: "from-blue-500 to-cyan-500" },
+                { label: "Executes", sub: "Agent signs tx", color: "from-polka-pink to-rose-500" },
+                { label: "Confirmed", sub: "On Polkadot Hub", color: "from-emerald-500 to-green-500" },
+              ].map((step, i) => (
+                <div key={step.label} className="flex items-center gap-2 flex-shrink-0">
+                  <div className="text-center">
+                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center text-white text-lg font-bold mx-auto mb-1.5 shadow-lg`}>
+                      {i + 1}
+                    </div>
+                    <p className="text-[11px] font-medium text-white">{step.label}</p>
+                    <p className="text-[9px] text-white/25">{step.sub}</p>
+                  </div>
+                  {i < 4 && <ArrowRight size={16} className="text-white/10 flex-shrink-0 mt-[-16px]" />}
+                </div>
+              ))}
             </div>
-          </ScrollReveal>
+          </div>
         </div>
       </section>
 
       {/* Comparison */}
-      <section className="py-28 px-6">
+      <section className="py-28 px-6 bg-white/[0.01]">
         <div className="max-w-4xl mx-auto">
-          <ScrollReveal className="text-center mb-12">
-            <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">Why PolkaAgent?</h2>
-          </ScrollReveal>
-          <div className="grid grid-cols-2 gap-4">
-            <ScrollReveal delay={0}>
-              <div className="p-6 rounded-xl tech-card h-full">
-                <h3 className="font-display text-[15px] font-semibold text-polka-text/80 mb-4 tracking-wide uppercase">Traditional DeFi</h3>
-                <div className="space-y-3">
-                  {[
-                    "Navigate to DEX manually",
-                    "Approve token -> wait -> swap -> wait",
-                    "Check prices yourself",
-                    "Miss opportunities while sleeping",
-                    "One action at a time",
-                    "No risk management",
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-2.5 text-[13px] text-polka-text/70">
-                      <span className="text-red-400/50 text-[10px]">&#10005;</span> {item}
-                    </div>
-                  ))}
-                </div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight">Why PolkaAgent?</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <h3 className="text-[14px] font-semibold text-white/40 mb-4">Traditional DeFi</h3>
+              <div className="space-y-3">
+                {[
+                  "Navigate to DEX manually",
+                  "Approve token → wait → swap → wait",
+                  "Check prices yourself",
+                  "Miss opportunities while sleeping",
+                  "One action at a time",
+                  "No risk management",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-[13px] text-white/25">
+                    <span className="text-red-400/40">✕</span> {item}
+                  </div>
+                ))}
               </div>
-            </ScrollReveal>
-            <ScrollReveal delay={200}>
-              <div className="p-6 rounded-xl tech-card border-polka-pink/10 h-full">
-                <h3 className="font-display text-[15px] font-semibold text-polka-pink mb-4 tracking-wide uppercase">PolkaAgent</h3>
-                <div className="space-y-3">
-                  {[
-                    "One-click autonomous execution",
-                    "AI handles approvals and routing",
-                    "Real-time signal detection",
-                    "24/7 continuous auto-trading",
-                    "Multi-step strategies in one command",
-                    "On-chain spending limits + guardrails",
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-2.5 text-[13px] text-white/70">
-                      <span className="text-emerald-400 text-[10px]">&#10003;</span> {item}
-                    </div>
-                  ))}
-                </div>
+            </div>
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-polka-pink/[0.04] to-polka-purple/[0.04] border border-polka-pink/10">
+              <h3 className="text-[14px] font-semibold text-polka-pink mb-4">PolkaAgent</h3>
+              <div className="space-y-3">
+                {[
+                  "One-click autonomous execution",
+                  "AI handles approvals and routing",
+                  "Real-time signal detection",
+                  "24/7 continuous auto-trading",
+                  "Multi-step strategies in one command",
+                  "On-chain spending limits + guardrails",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 text-[13px] text-white/60">
+                    <span className="text-emerald-400">✓</span> {item}
+                  </div>
+                ))}
               </div>
-            </ScrollReveal>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-28 px-6">
-        <ScrollReveal className="max-w-2xl mx-auto text-center">
-          <div className="w-16 h-16 rounded-lg border border-polka-pink/20 bg-polka-card flex items-center justify-center mx-auto mb-8">
-            <Bot size={32} className="text-polka-pink" />
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-polka-pink to-polka-purple flex items-center justify-center shadow-2xl shadow-polka-pink/30 mx-auto mb-8">
+            <Bot size={32} className="text-white" />
           </div>
-          <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-4">Start Trading<br /><span className="text-polka-pink">Autonomously</span></h2>
-          <p className="text-polka-text mb-8 font-light">Connect your wallet to access the dashboard. No signup. No KYC. Just connect and go.</p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Start trading autonomously</h2>
+          <p className="text-white/30 mb-8">Connect your wallet to access the dashboard. No signup. No KYC. Just connect and go.</p>
           <ConnectButton />
-          <p className="font-mono text-[9px] text-polka-text/50 mt-8 uppercase tracking-[0.15em]">Built for the Polkadot Solidity Hackathon 2026 | Track 1: AI-Powered DeFi</p>
-        </ScrollReveal>
+          <p className="text-[10px] text-white/15 mt-6">Built for the Polkadot Solidity Hackathon 2026 | Track 1: AI-Powered DeFi</p>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-polka-border py-8 px-6">
+      <footer className="border-t border-white/[0.04] py-8 px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Bot size={14} className="text-polka-text/60" />
-            <span className="font-mono text-[10px] text-polka-text/60 uppercase tracking-[0.15em]">PolkaAgent</span>
+          <div className="flex items-center gap-2">
+            <Bot size={16} className="text-white/20" />
+            <span className="text-[12px] text-white/20">PolkaAgent</span>
           </div>
-          <div className="flex items-center gap-5 font-mono text-[9px] text-polka-text/50 uppercase tracking-wider">
-            <a href="https://faucet.polkadot.io/" target="_blank" rel="noopener noreferrer" className="hover:text-polka-pink transition-smooth">Faucet</a>
-            <a href="https://docs.polkadot.com/smart-contracts/overview/" target="_blank" rel="noopener noreferrer" className="hover:text-polka-pink transition-smooth">Polkadot Docs</a>
-            <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener noreferrer" className="hover:text-polka-pink transition-smooth">DeepSeek</a>
+          <div className="flex items-center gap-4 text-[11px] text-white/15">
+            <a href="https://faucet.polkadot.io/" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-smooth">Faucet</a>
+            <a href="https://docs.polkadot.com/smart-contracts/overview/" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-smooth">Polkadot Docs</a>
+            <a href="https://api-docs.deepseek.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white/40 transition-smooth">DeepSeek</a>
           </div>
         </div>
       </footer>
@@ -710,41 +498,39 @@ function Dashboard({ address }: { address: string }) {
   };
 
   return (
-    <div className="min-h-screen bg-polka-dark grid-bg scanlines">
+    <div className="min-h-screen gradient-bg">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-polka-border glass sticky top-0 z-10">
+      <header className="flex items-center justify-between px-6 py-3 border-b border-polka-border/30 glass sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <div className="w-8 h-8 rounded-lg border border-polka-pink/20 bg-polka-card flex items-center justify-center">
-              <Bot size={16} className="text-polka-pink" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-polka-pink to-polka-purple flex items-center justify-center shadow-lg shadow-polka-pink/25">
+              <Bot size={18} className="text-white" />
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border-2 border-polka-dark status-dot" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#0a0a12] status-dot" />
           </div>
-          <div className="flex items-baseline gap-1.5">
-            <h1 className="font-display text-base font-bold tracking-wider uppercase">Polka<span className="text-polka-pink">Agent</span></h1>
-            <span className="font-mono text-[8px] text-polka-text/60">v1.0</span>
-          </div>
+          <h1 className="text-base font-bold tracking-tight">Polka<span className="text-transparent bg-clip-text bg-gradient-to-r from-polka-pink to-polka-purple">Agent</span></h1>
         </div>
         <div className="flex items-center gap-2">
-          <nav className="hidden md:flex items-center gap-0.5 mr-3">
+          <nav className="hidden md:flex items-center gap-1 mr-2">
             {[
-              { href: "/signals", icon: <TrendingUp size={12} />, label: "Signals" },
-              { href: "/swap", icon: <ArrowRightLeft size={12} />, label: "Swap" },
-              { href: "/portfolio", icon: <PieChart size={12} />, label: "Portfolio" },
-              { href: "/settings", icon: <Settings size={12} />, label: "Settings" },
+              { href: "/signals", icon: <TrendingUp size={13} />, label: "Signals" },
+              { href: "/xcm", icon: <Globe size={13} />, label: "XCM" },
+              { href: "/swap", icon: <ArrowRightLeft size={13} />, label: "Swap" },
+              { href: "/portfolio", icon: <PieChart size={13} />, label: "Portfolio" },
+              { href: "/settings", icon: <Settings size={13} />, label: "Settings" },
             ].map(item => (
-              <Link key={item.href} href={item.href} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-[10px] text-polka-text/70 hover:text-polka-pink hover:bg-polka-pink/[0.03] uppercase tracking-wider transition-smooth">{item.icon} {item.label}</Link>
+              <Link key={item.href} href={item.href} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] text-polka-text/50 hover:text-white hover:bg-white/[0.04] transition-smooth">{item.icon} {item.label}</Link>
             ))}
           </nav>
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-emerald-500/15 bg-emerald-500/[0.03]">
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/15">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 status-dot" />
-            <span className="font-mono text-[8px] text-emerald-400 uppercase tracking-wider">TestNet</span>
+            <span className="text-[9px] text-emerald-400 font-medium">TestNet</span>
           </div>
           <ConnectButton />
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-6 space-y-4">
+      <div className="max-w-6xl mx-auto px-6 py-6 space-y-5">
         {/* Onboarding Banner */}
         {portfolio && !portfolio.agent_wallet_address && (
           <OnboardingBanner address={address} onComplete={refresh} />
@@ -753,18 +539,18 @@ function Dashboard({ address }: { address: string }) {
         {/* Auto-Trade + Portfolio Row */}
         <div className="grid grid-cols-12 gap-4">
           {/* Auto-Trade Toggle */}
-          <div className={`col-span-12 md:col-span-7 p-5 rounded-xl transition-smooth ${autoTradeEnabled ? "tech-card border-emerald-500/15" : "tech-card"}`}>
-            <div className="flex items-center justify-between mb-5">
+          <div className={`col-span-12 md:col-span-7 p-5 rounded-2xl border transition-smooth ${autoTradeEnabled ? "bg-emerald-500/[0.04] border-emerald-500/15" : "bg-white/[0.02] border-polka-border/20"}`}>
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-smooth ${autoTradeEnabled ? "border-emerald-500/20 bg-emerald-500/[0.05]" : "border-polka-border bg-polka-darker"}`}>
-                  {autoTradeEnabled ? <Zap size={18} className="text-emerald-400" /> : <Target size={18} className="text-polka-text/70" />}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${autoTradeEnabled ? "bg-gradient-to-br from-emerald-500 to-cyan-500" : "bg-white/[0.06]"}`}>
+                  {autoTradeEnabled ? <Zap size={18} className="text-white" /> : <Target size={18} className="text-polka-text/40" />}
                 </div>
                 <div>
-                  <h3 className="font-display text-[15px] font-semibold text-white tracking-wide">Continuous Auto-Trade</h3>
-                  <p className="font-mono text-[9px] text-polka-text/70 uppercase tracking-wider">{autoTradeEnabled ? `Active | ${autoTradeStats.total_trades} trades | 60s interval` : "AI monitors signals and trades automatically"}</p>
+                  <h3 className="text-[14px] font-semibold text-white">Continuous Auto-Trade</h3>
+                  <p className="text-[11px] text-polka-text/40">{autoTradeEnabled ? `Active | ${autoTradeStats.total_trades} trades | Checking every 60s` : "AI monitors signals and trades automatically"}</p>
                 </div>
               </div>
-              <button onClick={toggleAutoTrade} disabled={autoTradeLoading} className={`relative w-14 h-7 rounded-full transition-smooth ${autoTradeEnabled ? "bg-emerald-500/80" : "bg-polka-border"}`}>
+              <button onClick={toggleAutoTrade} disabled={autoTradeLoading} className={`relative w-14 h-7 rounded-full transition-smooth ${autoTradeEnabled ? "bg-emerald-500" : "bg-white/[0.08]"}`}>
                 {autoTradeLoading ? <Loader2 size={14} className="absolute top-1.5 left-1/2 -translate-x-1/2 animate-spin text-white" /> : <div className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-smooth ${autoTradeEnabled ? "left-8" : "left-1"}`} />}
               </button>
             </div>
@@ -772,17 +558,17 @@ function Dashboard({ address }: { address: string }) {
             {/* Strategy Buttons */}
             <div className="grid grid-cols-3 gap-2">
               {[
-                { label: "Quick Swap", sub: "10 PAS -> USDT", key: "quick-swap", cmd: "Swap 10 PAS for USDT", icon: <ArrowRightLeft size={12} /> },
-                { label: "Diversify", sub: "Split to stables", key: "diversify", cmd: "Swap 5 PAS for USDT and 5 PAS for USDC", icon: <Layers size={12} /> },
-                { label: "Trade Now", sub: "On signals", key: "trade-now", cmd: "Auto trade based on signals", icon: <TrendingUp size={12} /> },
+                { label: "Quick Swap", sub: "10 PAS → USDT", key: "quick-swap", cmd: "Swap 10 PAS for USDT", gradient: "from-polka-pink to-polka-purple" },
+                { label: "Diversify", sub: "Split to stables", key: "diversify", cmd: "Swap 5 PAS for USDT and 5 PAS for USDC", gradient: "from-violet-500 to-purple-500" },
+                { label: "Trade Now", sub: "On signals", key: "trade-now", cmd: "Auto trade based on signals", gradient: "from-amber-500 to-orange-500" },
               ].map(s => (
                 <button key={s.key} onClick={() => executeAction(s.cmd, s.key)} disabled={isExecuting === s.key}
-                  className="p-3 rounded-lg border border-polka-border bg-polka-darker hover:border-polka-pink/15 hover:bg-polka-pink/[0.02] disabled:opacity-40 transition-smooth text-left group">
-                  <div className="w-7 h-7 rounded-md border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink mb-2 group-hover:bg-polka-pink/10 transition-smooth">
-                    {isExecuting === s.key ? <Loader2 size={12} className="animate-spin" /> : s.icon}
+                  className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.04] hover:bg-white/[0.06] hover:border-white/[0.08] disabled:opacity-40 transition-smooth text-left group">
+                  <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${s.gradient} flex items-center justify-center text-white mb-2 group-hover:scale-110 transition-smooth`}>
+                    {isExecuting === s.key ? <Loader2 size={13} className="animate-spin" /> : <ArrowRight size={13} />}
                   </div>
-                  <p className="font-display text-[12px] font-semibold text-white tracking-wide">{s.label}</p>
-                  <p className="font-mono text-[9px] text-polka-text/60 uppercase tracking-wider">{s.sub}</p>
+                  <p className="text-[12px] font-medium text-white">{s.label}</p>
+                  <p className="text-[10px] text-white/25">{s.sub}</p>
                 </button>
               ))}
             </div>
@@ -792,87 +578,88 @@ function Dashboard({ address }: { address: string }) {
           </div>
 
           {/* Portfolio */}
-          <div className="col-span-12 md:col-span-5 p-5 rounded-xl tech-card">
+          <div className="col-span-12 md:col-span-5 p-5 rounded-2xl bg-white/[0.02] border border-polka-border/20">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="tech-label text-polka-text/80">Portfolio</h2>
-              <button onClick={refresh} disabled={portfolioLoading} className="text-polka-text/60 hover:text-polka-pink transition-smooth">
+              <h2 className="text-[10px] font-semibold text-polka-text/40 uppercase tracking-[0.15em]">Portfolio</h2>
+              <button onClick={refresh} disabled={portfolioLoading} className="text-polka-text/30 hover:text-white transition-smooth">
                 <RefreshCw size={12} className={portfolioLoading ? "animate-spin" : ""} />
               </button>
             </div>
             {portfolio ? (
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {Object.entries(portfolio.token_balances).map(([token, data]) => {
                   const bal = typeof data === "string" ? data : data?.wallet || "0";
                   const agentBal = typeof data === "string" ? "0" : data?.agent_wallet || "0";
                   const total = parseFloat(bal) + parseFloat(agentBal);
+                  const colors: Record<string, string> = { PAS: "from-polka-pink to-polka-purple", USDT: "from-green-500 to-emerald-500", USDC: "from-blue-500 to-cyan-500" };
                   return (
-                    <div key={token} className="flex items-center gap-3 p-2.5 rounded-lg border border-polka-border bg-polka-darker hover:border-polka-pink/10 transition-smooth">
-                      <div className="w-8 h-8 rounded-md border border-polka-pink/15 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink font-mono text-[10px] font-bold">{token[0]}</div>
+                    <div key={token} className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] transition-smooth">
+                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${colors[token] || "from-gray-500 to-gray-600"} flex items-center justify-center text-white text-[10px] font-bold`}>{token[0]}</div>
                       <div className="flex-1">
-                        <div className="flex justify-between"><span className="font-display text-[13px] font-semibold text-white tracking-wide">{token}</span><span className="font-mono text-[13px] text-white">{formatBalance(String(total))}</span></div>
-                        {parseFloat(agentBal) > 0 && <div className="flex justify-between"><span className="font-mono text-[8px] text-polka-text/50 uppercase tracking-wider">Agent</span><span className="font-mono text-[9px] text-polka-text/60">{formatBalance(agentBal)}</span></div>}
+                        <div className="flex justify-between"><span className="text-[13px] font-medium text-white">{token}</span><span className="text-[13px] font-mono text-white">{formatBalance(String(total))}</span></div>
+                        {parseFloat(agentBal) > 0 && <div className="flex justify-between"><span className="text-[9px] text-polka-text/25">Agent</span><span className="text-[9px] text-polka-text/35 font-mono">{formatBalance(agentBal)}</span></div>}
                       </div>
                     </div>
                   );
                 })}
                 {/* Prices */}
                 {Object.keys(prices).length > 0 && (
-                  <div className="pt-2.5 border-t border-polka-border grid grid-cols-2 gap-2">
+                  <div className="pt-2 border-t border-white/[0.04] grid grid-cols-2 gap-2">
                     {Object.entries(prices).map(([token, data]: [string, any]) => (
-                      <div key={token} className="p-2.5 rounded-lg border border-polka-border bg-polka-darker text-center">
-                        <p className="font-mono text-[7px] text-polka-text/60 uppercase tracking-[0.2em]">PAS/{token}</p>
-                        <p className="num-display text-[16px] text-white mt-0.5">{parseFloat(data.price_in_pas).toFixed(4)}</p>
+                      <div key={token} className="p-2 rounded-lg bg-white/[0.02] text-center">
+                        <p className="text-[8px] text-white/20 uppercase tracking-wider">PAS/{token}</p>
+                        <p className="text-[14px] font-mono font-semibold text-white">{parseFloat(data.price_in_pas).toFixed(4)}</p>
                       </div>
                     ))}
                   </div>
                 )}
               </div>
-            ) : <p className="text-polka-text/60 text-sm font-mono">Loading...</p>}
+            ) : <p className="text-polka-text/30 text-sm">Loading...</p>}
           </div>
         </div>
 
         {/* Signals + Log */}
         <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 md:col-span-6 p-5 rounded-xl tech-card">
+          <div className="col-span-12 md:col-span-6 p-5 rounded-2xl bg-white/[0.02] border border-polka-border/20">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="tech-label text-polka-text/80 flex items-center gap-1.5"><Activity size={10} /> Live Signals</h2>
-              <Link href="/signals" className="font-mono text-[9px] text-polka-pink/40 hover:text-polka-pink flex items-center gap-1 uppercase tracking-wider transition-smooth">View all <ChevronRight size={10} /></Link>
+              <h2 className="text-[10px] font-semibold text-polka-text/40 uppercase tracking-[0.15em] flex items-center gap-1.5"><Activity size={10} /> Signals</h2>
+              <Link href="/signals" className="text-[10px] text-polka-pink/50 hover:text-polka-pink flex items-center gap-1 transition-smooth">All <ChevronRight size={10} /></Link>
             </div>
             {signals.length > 0 ? (
               <div className="space-y-2">
                 {signals.slice(0, 4).map((s, i) => (
-                  <div key={i} className={`p-3 rounded-lg border text-[11px] ${s.signal_type === "BUY" ? "bg-emerald-500/[0.03] border-emerald-500/10" : "bg-amber-500/[0.03] border-amber-500/10"}`}>
+                  <div key={i} className={`p-3 rounded-xl text-[11px] ${s.signal_type === "BUY" ? "bg-emerald-500/[0.04] border border-emerald-500/8" : "bg-amber-500/[0.04] border border-amber-500/8"}`}>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className={`font-mono font-bold text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider ${s.signal_type === "BUY" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/15" : "bg-amber-500/10 text-amber-400 border border-amber-500/15"}`}>{s.signal_type}</span>
-                      <span className="text-white/70 font-display font-semibold tracking-wide">{s.token}</span>
-                      <span className="font-mono text-polka-text/50 text-[8px] ml-auto uppercase">{s.strength}</span>
+                      <span className={`font-bold text-[9px] px-1.5 py-0.5 rounded ${s.signal_type === "BUY" ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"}`}>{s.signal_type}</span>
+                      <span className="text-white/70 font-medium">{s.token}</span>
+                      <span className="text-white/15 text-[9px] ml-auto">{s.strength}</span>
                     </div>
-                    <p className="text-polka-text/70 leading-snug">{s.reason.slice(0, 70)}</p>
+                    <p className="text-white/30 leading-snug">{s.reason.slice(0, 70)}</p>
                   </div>
                 ))}
               </div>
-            ) : <div className="text-center py-8"><Activity size={20} className="mx-auto text-polka-text/30 mb-2" /><p className="font-mono text-polka-text/50 text-[10px] uppercase tracking-wider">No signals. Market stable.</p></div>}
+            ) : <div className="text-center py-6"><Activity size={20} className="mx-auto text-white/5 mb-2" /><p className="text-white/20 text-[11px]">No signals. Market stable.</p></div>}
           </div>
 
-          <div className="col-span-12 md:col-span-6 p-5 rounded-xl tech-card">
-            <h2 className="tech-label text-polka-text/80 flex items-center gap-1.5 mb-3"><Clock size={10} /> Execution Log</h2>
+          <div className="col-span-12 md:col-span-6 p-5 rounded-2xl bg-white/[0.02] border border-polka-border/20">
+            <h2 className="text-[10px] font-semibold text-polka-text/40 uppercase tracking-[0.15em] flex items-center gap-1.5 mb-3"><Clock size={10} /> Execution Log</h2>
             {executions.length > 0 ? (
-              <div className="space-y-1.5 max-h-[280px] overflow-y-auto scrollbar-hide">
+              <div className="space-y-1.5 max-h-[280px] overflow-y-auto">
                 {executions.slice(0, 12).map(exec => (
-                  <div key={exec.id} className={`p-2.5 rounded-lg border text-[11px] success-pop ${exec.status === "confirmed" ? "bg-emerald-500/[0.02] border-emerald-500/8" : exec.status === "failed" ? "bg-red-500/[0.02] border-red-500/8" : "bg-polka-pink/[0.02] border-polka-pink/8"}`}>
+                  <div key={exec.id} className={`p-2.5 rounded-xl text-[11px] success-pop ${exec.status === "confirmed" ? "bg-emerald-500/[0.03] border border-emerald-500/8" : exec.status === "failed" ? "bg-red-500/[0.03] border border-red-500/8" : "bg-polka-pink/[0.03] border border-polka-pink/8"}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         {exec.status === "executing" ? <Loader2 size={10} className="text-polka-pink animate-spin" /> : exec.status === "confirmed" ? <Check size={10} className="text-emerald-400" /> : <span className="text-red-400 text-[9px]">!</span>}
-                        <span className="text-white/60 font-display font-semibold tracking-wide">{exec.action}</span>
+                        <span className="text-white/60 font-medium">{exec.action}</span>
                       </div>
-                      <span className="font-mono text-polka-text/40 text-[7px] tracking-wider">{new Date(exec.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
+                      <span className="text-white/10 text-[8px] font-mono">{new Date(exec.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span>
                     </div>
-                    <p className="text-polka-text/60 text-[10px] mt-0.5">{exec.description}</p>
-                    {exec.tx_hash && <a href={`https://blockscout-testnet.polkadot.io/tx/0x${exec.tx_hash}`} target="_blank" rel="noopener noreferrer" className="text-polka-pink/30 hover:text-polka-pink text-[8px] font-mono mt-0.5 flex items-center gap-1 transition-smooth">{exec.tx_hash.slice(0, 12)}... <ExternalLink size={7} /></a>}
+                    <p className="text-white/25 text-[10px] mt-0.5">{exec.description}</p>
+                    {exec.tx_hash && <a href={`https://blockscout-testnet.polkadot.io/tx/0x${exec.tx_hash}`} target="_blank" rel="noopener noreferrer" className="text-polka-pink/40 hover:text-polka-pink text-[8px] font-mono mt-0.5 flex items-center gap-1 transition-smooth">{exec.tx_hash.slice(0, 12)}... <ExternalLink size={7} /></a>}
                   </div>
                 ))}
               </div>
-            ) : <div className="text-center py-8"><Zap size={20} className="mx-auto text-polka-text/30 mb-2" /><p className="font-mono text-polka-text/50 text-[10px] uppercase tracking-wider">No executions yet</p></div>}
+            ) : <div className="text-center py-6"><Zap size={20} className="mx-auto text-white/5 mb-2" /><p className="text-white/20 text-[11px]">No executions yet</p></div>}
           </div>
         </div>
       </div>
@@ -899,6 +686,7 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
         args: [AGENT_ADDRESS as `0x${string}`],
       });
       setStep(2);
+      // Wait for tx to be indexed
       setTimeout(() => { onComplete(); setStep(3); }, 5000);
     } catch (err) {
       console.error("Create wallet failed:", err);
@@ -907,29 +695,29 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
   };
 
   return (
-    <div className="p-5 rounded-xl tech-card border-polka-pink/10">
+    <div className="p-5 rounded-2xl bg-gradient-to-r from-polka-pink/[0.06] to-polka-purple/[0.06] border border-polka-pink/15">
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 rounded-lg border border-polka-pink/20 bg-polka-pink/[0.05] flex items-center justify-center text-polka-pink flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-polka-pink to-polka-purple flex items-center justify-center text-white flex-shrink-0">
           <Shield size={18} />
         </div>
         <div className="flex-1">
-          <h3 className="font-display text-[16px] font-semibold text-white mb-1 tracking-wide">Set Up Your Agent Wallet</h3>
-          <p className="text-[12px] text-polka-text/80 mb-4 leading-relaxed">
+          <h3 className="text-[15px] font-semibold text-white mb-1">Set up your Agent Wallet</h3>
+          <p className="text-[12px] text-white/40 mb-4 leading-relaxed">
             Create a smart contract wallet so the AI agent can execute trades autonomously on your behalf.
-            Secured by on-chain spending limits.
+            Secured by on-chain spending limits — you stay in control.
           </p>
 
           {/* Steps */}
           <div className="flex items-center gap-3 mb-4">
             {["Create Wallet", "Deposit PAS", "Start Trading"].map((label, i) => (
               <div key={label} className="flex items-center gap-2">
-                <div className={`w-6 h-6 rounded-md flex items-center justify-center font-mono text-[9px] font-bold border ${
-                  step > i + 1 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : step === i + 1 ? "bg-polka-pink/10 border-polka-pink/20 text-polka-pink" : "bg-polka-darker border-polka-border text-polka-text/60"
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                  step > i + 1 ? "bg-emerald-500 text-white" : step === i + 1 ? "bg-polka-pink text-white" : "bg-white/[0.06] text-white/30"
                 }`}>
-                  {step > i + 1 ? <Check size={10} /> : i + 1}
+                  {step > i + 1 ? <Check size={12} /> : i + 1}
                 </div>
-                <span className={`font-mono text-[10px] uppercase tracking-wider ${step === i + 1 ? "text-white" : "text-polka-text/60"}`}>{label}</span>
-                {i < 2 && <div className="w-6 h-px bg-polka-border" />}
+                <span className={`text-[11px] ${step === i + 1 ? "text-white" : "text-white/30"}`}>{label}</span>
+                {i < 2 && <div className="w-6 h-px bg-white/10" />}
               </div>
             ))}
           </div>
@@ -938,7 +726,7 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
             <button
               onClick={createWallet}
               disabled={isCreating}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-polka-pink/20 bg-polka-pink/10 text-polka-pink font-mono text-[11px] font-semibold uppercase tracking-wider hover:bg-polka-pink/15 disabled:opacity-50 transition-smooth"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-polka-pink to-polka-purple text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50 transition-smooth shadow-lg shadow-polka-pink/20"
             >
               {isCreating ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
               {isCreating ? "Confirm in MetaMask..." : "Create Agent Wallet"}
@@ -946,17 +734,17 @@ function OnboardingBanner({ address, onComplete }: { address: string; onComplete
           )}
 
           {step === 2 && (
-            <div className="flex items-center gap-2 text-emerald-400 font-mono text-[11px] uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-emerald-400 text-[13px]">
               <Loader2 size={14} className="animate-spin" /> Setting up wallet...
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-3">
-              <div className="flex items-center gap-2 text-emerald-400 font-mono text-[11px] uppercase tracking-wider">
-                <Check size={14} /> Wallet created!
+              <div className="flex items-center gap-2 text-emerald-400 text-[13px]">
+                <Check size={14} /> Wallet created! Now deposit PAS to start trading.
               </div>
-              <p className="text-[11px] text-polka-text/70">
+              <p className="text-[11px] text-white/30">
                 Send PAS to your Agent Wallet from the <Link href="/settings" className="text-polka-pink hover:underline">Settings</Link> page, or ask the AI: &quot;deposit 10 PAS&quot;
               </p>
             </div>
@@ -972,10 +760,10 @@ function CustomAction({ onExecute, isLoading }: { onExecute: (msg: string) => vo
   return (
     <div className="flex gap-2 mt-3">
       <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && input.trim() && !isLoading) { onExecute(input.trim()); setInput(""); }}}
-        placeholder="Custom command... e.g. 'Swap 50 PAS for USDC'" className="flex-1 px-3 py-2.5 rounded-lg border border-polka-border bg-polka-darker text-white font-mono text-[11px] placeholder-polka-text/50 focus:outline-none focus:border-polka-pink/15 transition-smooth" />
+        placeholder="Custom: 'Swap 50 PAS for USDC'" className="flex-1 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.04] text-white text-[12px] placeholder-white/15 focus:outline-none focus:border-polka-pink/20 transition-smooth" />
       <button onClick={() => { if (input.trim() && !isLoading) { onExecute(input.trim()); setInput(""); }}} disabled={!input.trim() || isLoading}
-        className="px-5 py-2.5 rounded-lg border border-polka-pink/20 bg-polka-pink/10 text-polka-pink font-mono text-[11px] font-semibold uppercase tracking-wider disabled:opacity-20 hover:bg-polka-pink/15 transition-smooth">
-        {isLoading ? <Loader2 size={14} className="animate-spin" /> : "Execute"}
+        className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-polka-pink to-polka-purple text-white text-[12px] font-medium disabled:opacity-20 hover:opacity-90 transition-smooth shadow-lg shadow-polka-pink/10">
+        {isLoading ? <Loader2 size={14} className="animate-spin" /> : "Run"}
       </button>
     </div>
   );

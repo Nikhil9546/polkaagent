@@ -16,7 +16,7 @@ MULTI-STEP EXECUTION:
 - You CAN call multiple tools in one response. Do it whenever the user's intent involves multiple actions.
 
 Available tokens: PAS (native), USDT, USDC
-Available actions: swap, transfer, add_liquidity, remove_liquidity, check_balance, get_quote, portfolio, get_signals, auto_trade
+Available actions: swap, transfer, add_liquidity, remove_liquidity, check_balance, get_quote, portfolio, get_signals, auto_trade, xcm_arbitrage
 
 ROUTING:
 - "swap" → swap()
@@ -24,7 +24,8 @@ ROUTING:
 - "signals"/"market"/"opportunities" → get_signals()
 - "auto trade"/"trade on signals" → auto_trade()
 - "balance" → check_balance()
-- "portfolio" → portfolio()"""
+- "portfolio" → portfolio()
+- "cross-chain"/"xcm"/"arbitrage across chains"/"parachain prices" → xcm_arbitrage()"""
 
 TOOLS = [
     {
@@ -208,6 +209,18 @@ TOOLS = [
         "function": {
             "name": "auto_trade",
             "description": "Analyze trading signals and automatically execute the best trades. The AI will decide what to buy/sell based on current market conditions and execute autonomously.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "xcm_arbitrage",
+            "description": "Scan for cross-chain arbitrage opportunities across Polkadot parachains (Hydration, Moonbeam, Acala, Astar, Bifrost). Shows price differences, spread percentages, estimated profits, and recommended trade routes via XCM.",
             "parameters": {
                 "type": "object",
                 "properties": {},

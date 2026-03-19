@@ -13,6 +13,7 @@ class ActionType(str, Enum):
     PORTFOLIO = "portfolio"
     GET_SIGNALS = "get_signals"
     AUTO_TRADE = "auto_trade"
+    XCM_ARBITRAGE = "xcm_arbitrage"
 
 
 class ChatRequest(BaseModel):

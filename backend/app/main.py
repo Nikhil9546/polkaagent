@@ -6,6 +6,7 @@ from .api.portfolio import router as portfolio_router
 from .api.execute import router as execute_router
 from .api.signals import router as signals_router
 from .api.autotrade import router as autotrade_router
+from .api.xcm import router as xcm_router
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,6 +29,7 @@ app.include_router(portfolio_router, prefix="/api", tags=["Portfolio"])
 app.include_router(execute_router, prefix="/api", tags=["Execute"])
 app.include_router(signals_router, prefix="/api", tags=["Signals"])
 app.include_router(autotrade_router, prefix="/api", tags=["AutoTrade"])
+app.include_router(xcm_router, prefix="/api", tags=["XCM"])
 
 
 @app.get("/")

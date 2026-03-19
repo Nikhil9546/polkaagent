@@ -14,6 +14,7 @@ from ..chain.reader import (
 from ..chain.tx_builder import build_transaction
 from ..chain.executor import execute_swap_autonomous, execute_transfer_autonomous
 from ..chain.signals import get_all_prices, generate_signals
+from ..chain.xcm import get_xcm_arbitrage_summary
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -118,6 +119,9 @@ def execute_tool(action: str, params: dict, wallet_address: str) -> dict:
                 "total_signals": len(signals),
                 "trades_executed": len(executed),
             }
+
+        elif action == "xcm_arbitrage":
+            return get_xcm_arbitrage_summary()
 
         else:
             return {"error": f"Unknown action: {action}"}
