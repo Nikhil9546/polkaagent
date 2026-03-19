@@ -14,6 +14,7 @@ class ActionType(str, Enum):
     GET_SIGNALS = "get_signals"
     AUTO_TRADE = "auto_trade"
     XCM_ARBITRAGE = "xcm_arbitrage"
+    XCM_TRANSFER = "xcm_transfer"
 
 
 class ChatRequest(BaseModel):

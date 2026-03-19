@@ -15,8 +15,8 @@ MULTI-STEP EXECUTION:
 - For "swap and then send" — call swap() then transfer() in sequence.
 - You CAN call multiple tools in one response. Do it whenever the user's intent involves multiple actions.
 
-Available tokens: PAS (native), USDT, USDC
-Available actions: swap, transfer, add_liquidity, remove_liquidity, check_balance, get_quote, portfolio, get_signals, auto_trade, xcm_arbitrage
+Available tokens: PAS (native), USDT, USDC, DOT
+Available actions: swap, transfer, add_liquidity, remove_liquidity, check_balance, get_quote, portfolio, get_signals, auto_trade, xcm_arbitrage, xcm_transfer
 
 ROUTING:
 - "swap" → swap()
@@ -25,7 +25,8 @@ ROUTING:
 - "auto trade"/"trade on signals" → auto_trade()
 - "balance" → check_balance()
 - "portfolio" → portfolio()
-- "cross-chain"/"xcm"/"arbitrage across chains"/"parachain prices" → xcm_arbitrage()"""
+- "cross-chain arbitrage"/"parachain prices" → xcm_arbitrage()
+- "xcm transfer"/"send via xcm"/"transfer to Asset Hub"/"cross-chain transfer"/"send DOT to parachain" → xcm_transfer()"""
 
 TOOLS = [
     {
@@ -225,6 +226,28 @@ TOOLS = [
                 "type": "object",
                 "properties": {},
                 "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "xcm_transfer",
+            "description": "Execute a real cross-chain transfer of PAS/DOT to another parachain via XCM precompile. Transfers tokens from Polkadot Hub to destination parachain (e.g., Asset Hub para 1000, Hydration para 2034, Moonbeam para 2004).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": "string",
+                        "description": "Amount of PAS/DOT to transfer (e.g., '0.5', '1', '10')",
+                    },
+                    "dest_para_id": {
+                        "type": "integer",
+                        "description": "Destination parachain ID. Asset Hub=1000, Acala=2000, Moonbeam=2004, Astar=2006, Bifrost=2030, Hydration=2034. Default: 1000.",
+                        "default": 1000,
+                    },
+                },
+                "required": ["amount"],
             },
         },
     },

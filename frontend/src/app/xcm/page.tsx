@@ -168,7 +168,7 @@ export default function XCMPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="num-display text-[18px] font-bold text-emerald-400">+${opp.estimated_profit_usd.toFixed(2)}</p>
+                      <p className="num-display text-[18px] font-bold text-emerald-400">+{opp.spread_pct ?? 0}%</p>
                       <p className="font-mono text-[8px] text-polka-text/50 uppercase tracking-wider">est. profit</p>
                     </div>
                   </div>
@@ -179,11 +179,11 @@ export default function XCMPage() {
                       {opp.buy_chain}
                     </div>
                     <div className="flex items-center gap-1 text-polka-text/40">
-                      <span className="font-mono text-[9px] tracking-wider">Buy @ ${opp.buy_price.toFixed(4)}</span>
+                      <span className="font-mono text-[9px] tracking-wider">Buy @ ${(opp.buy_price ?? 0).toFixed(4)}</span>
                       <ArrowRightLeft size={12} />
                       <span className="font-mono text-[9px] tracking-wider text-polka-pink/60">XCM</span>
                       <ArrowRightLeft size={12} />
-                      <span className="font-mono text-[9px] tracking-wider">Sell @ ${opp.sell_price.toFixed(4)}</span>
+                      <span className="font-mono text-[9px] tracking-wider">Sell @ ${(opp.sell_price ?? 0).toFixed(4)}</span>
                     </div>
                     <div className={`px-3 py-1.5 rounded-md border ${CHAIN_COLORS[opp.sell_chain] || "border-polka-border bg-polka-darker text-polka-text"} text-[11px] font-medium font-mono`}>
                       {opp.sell_chain}
@@ -194,17 +194,16 @@ export default function XCMPage() {
                     <div className="p-2.5 rounded-lg bg-polka-darker border border-polka-border">
                       <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">Buy on</p>
                       <p className="text-[12px] text-white font-medium mt-1">{opp.buy_dex}</p>
-                      <p className="font-mono text-[11px] text-polka-text/70 tracking-wider">${opp.buy_price.toFixed(4)}</p>
+                      <p className="font-mono text-[11px] text-polka-text/70 tracking-wider">${(opp.buy_price ?? 0).toFixed(4)}</p>
                     </div>
                     <div className="p-2.5 rounded-lg bg-polka-darker border border-polka-border">
                       <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">Sell on</p>
                       <p className="text-[12px] text-white font-medium mt-1">{opp.sell_dex}</p>
-                      <p className="font-mono text-[11px] text-polka-text/70 tracking-wider">${opp.sell_price.toFixed(4)}</p>
+                      <p className="font-mono text-[11px] text-polka-text/70 tracking-wider">${(opp.sell_price ?? 0).toFixed(4)}</p>
                     </div>
                     <div className="p-2.5 rounded-lg bg-polka-darker border border-polka-border">
-                      <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">Trade Size</p>
-                      <p className="font-mono text-[12px] text-white font-medium mt-1">${opp.trade_size_usd.toLocaleString()}</p>
-                      <p className="font-mono text-[11px] text-emerald-400 tracking-wider">+{opp.spread_pct.toFixed(2)}%</p>
+                      <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">Spread</p>
+                      <p className="font-mono text-[12px] text-emerald-400 font-medium mt-1">+{opp.spread_pct ?? 0}%</p>
                     </div>
                   </div>
                 </div>

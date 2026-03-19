@@ -15,6 +15,7 @@ from ..chain.tx_builder import build_transaction
 from ..chain.executor import execute_swap_autonomous, execute_transfer_autonomous
 from ..chain.signals import get_all_prices, generate_signals
 from ..chain.xcm import get_xcm_arbitrage_summary
+from ..chain.xcm_builder import execute_real_xcm_transfer
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -122,6 +123,16 @@ def execute_tool(action: str, params: dict, wallet_address: str) -> dict:
 
         elif action == "xcm_arbitrage":
             return get_xcm_arbitrage_summary()
+
+        elif action == "xcm_transfer":
+            amount = float(params.get("amount", "0.1"))
+            dest = int(params.get("dest_para_id", 1000))
+            result = execute_real_xcm_transfer(
+                amount_pas=amount,
+                beneficiary="",  # defaults to agent address
+                dest_para_id=dest,
+            )
+            return result
 
         else:
             return {"error": f"Unknown action: {action}"}

@@ -1,12 +1,12 @@
-"""XCM Cross-Chain API — real prices, arbitrage detection, and XCM execution."""
+"""XCM Cross-Chain API — real prices, arbitrage detection, and real XCM transfers."""
 import logging
 from fastapi import APIRouter, HTTPException
 from ..chain.xcm import (
     get_cross_chain_prices,
     detect_arbitrage_opportunities,
     get_xcm_arbitrage_summary,
-    execute_xcm_transfer,
 )
+from ..chain.xcm_builder import execute_real_xcm_transfer
 from ..config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -46,20 +46,43 @@ async def xcm_summary():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/xcm/execute")
-async def xcm_execute():
-    """Execute a real XCM transfer via the precompile on Polkadot Hub."""
+@router.post("/xcm/transfer")
+async def xcm_transfer(
+    amount: float = 0.1,
+    beneficiary: str = "",
+    dest_para_id: int = 1000,
+):
+    """
+    Execute a real XCM transfer of PAS to another parachain.
+
+    - amount: PAS to transfer (default 0.1)
+    - beneficiary: EVM address on destination (default: agent address)
+    - dest_para_id: Target parachain (default: 1000 = Asset Hub)
+    """
     try:
-        settings = get_settings()
-        if not settings.agent_private_key:
+        s = get_settings()
+        if not s.agent_private_key:
             raise HTTPException(status_code=400, detail="Agent key not configured")
 
-        result = execute_xcm_transfer(settings.agent_private_key)
+        if not beneficiary:
+            beneficiary = w3_account_address(s.agent_private_key)
+
+        result = execute_real_xcm_transfer(
+            amount_pas=amount,
+            beneficiary=beneficiary,
+            dest_para_id=dest_para_id,
+            private_key=s.agent_private_key,
+        )
         if "error" in result:
             raise HTTPException(status_code=400, detail=result["error"])
         return result
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"XCM execute error: {e}", exc_info=True)
+        logger.error(f"XCM transfer error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def w3_account_address(private_key: str) -> str:
+    from ..chain.client import w3
+    return w3.eth.account.from_key(private_key).address
