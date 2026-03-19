@@ -15,36 +15,33 @@ try:
 except Exception:
     pass
 
-# Load ABIs from compiled contracts — try multiple paths for local + Railway
-_POSSIBLE_ROOTS = [
-    Path(__file__).parent.parent.parent.parent / "contracts" / "out",  # local dev
-    Path(__file__).parent.parent.parent.parent.parent / "contracts" / "out",  # Railway (root=backend)
-    Path("/app") / "contracts" / "out",  # Railway absolute
-    Path.cwd().parent / "contracts" / "out",  # relative to cwd
-    Path.cwd() / ".." / "contracts" / "out",
-]
-
-CONTRACTS_DIR = None
-for _p in _POSSIBLE_ROOTS:
-    if _p.exists():
-        CONTRACTS_DIR = _p
-        logger.info(f"Found contracts at: {_p}")
-        break
-
-if not CONTRACTS_DIR:
-    logger.warning(f"contracts/out not found in any of: {[str(p) for p in _POSSIBLE_ROOTS]}")
-    CONTRACTS_DIR = _POSSIBLE_ROOTS[0]  # fallback
+# Load ABIs — from backend/abi/ (always available) or contracts/out/ (local dev)
+ABI_DIR = Path(__file__).parent.parent.parent / "abi"  # backend/abi/
+CONTRACTS_DIR = Path(__file__).parent.parent.parent.parent / "contracts" / "out"  # local dev
 
 
 def load_abi(contract_name: str) -> list:
-    abi_path = CONTRACTS_DIR / f"{contract_name}.sol" / f"{contract_name}.json"
-    try:
-        if abi_path.exists():
+    # Try backend/abi/ first (works on Railway)
+    abi_path = ABI_DIR / f"{contract_name}.json"
+    if abi_path.exists():
+        try:
             with open(abi_path) as f:
                 artifact = json.load(f)
                 return artifact["abi"]
-    except Exception as e:
-        logger.warning(f"Could not load ABI for {contract_name}: {e}")
+        except Exception as e:
+            logger.warning(f"ABI load error {abi_path}: {e}")
+
+    # Fallback to contracts/out/ (local dev)
+    abi_path2 = CONTRACTS_DIR / f"{contract_name}.sol" / f"{contract_name}.json"
+    if abi_path2.exists():
+        try:
+            with open(abi_path2) as f:
+                artifact = json.load(f)
+                return artifact["abi"]
+        except Exception as e:
+            logger.warning(f"ABI load error {abi_path2}: {e}")
+
+    logger.warning(f"No ABI found for {contract_name}")
     return []
 
 
