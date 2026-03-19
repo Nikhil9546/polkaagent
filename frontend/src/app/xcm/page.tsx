@@ -10,6 +10,8 @@ import {
   Zap,
   ExternalLink,
   ChevronRight,
+  Activity,
+  BarChart3,
 } from "lucide-react";
 import Link from "next/link";
 import { ConnectButton } from "@/components/wallet/ConnectButton";
@@ -38,6 +40,15 @@ const CHAIN_COLORS: Record<string, string> = {
   "Acala": "from-red-500 to-orange-500",
   "Astar": "from-blue-600 to-violet-500",
   "Bifrost": "from-green-500 to-emerald-500",
+};
+
+const CHAIN_BORDER_COLORS: Record<string, string> = {
+  "Polkadot Hub": "border-polka-pink/15 bg-polka-pink/[0.05]",
+  "Hydration": "border-cyan-500/15 bg-cyan-500/[0.05]",
+  "Moonbeam": "border-purple-500/15 bg-purple-500/[0.05]",
+  "Acala": "border-red-500/15 bg-red-500/[0.05]",
+  "Astar": "border-blue-500/15 bg-blue-500/[0.05]",
+  "Bifrost": "border-green-500/15 bg-green-500/[0.05]",
 };
 
 export default function XCMPage() {
@@ -72,6 +83,10 @@ export default function XCMPage() {
 
   if (!mounted) return <div className="min-h-screen bg-polka-dark" />;
 
+  const totalProfit = opportunities.reduce((sum, o) => sum + o.estimated_profit_usd, 0);
+  const bestSpread = opportunities.length > 0 ? Math.max(...opportunities.map(o => o.spread_pct)) : 0;
+  const chainCount = Object.keys(prices).length;
+
   return (
     <div className="min-h-screen bg-polka-dark grid-bg scanlines">
       <header className="flex items-center justify-between px-6 py-3 border-b border-polka-border glass sticky top-0 z-10">
@@ -95,30 +110,65 @@ export default function XCMPage() {
       </header>
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+        {/* Summary Hero Card */}
+        <div className="relative overflow-hidden rounded-xl tech-card corner-accents p-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-polka-pink/[0.03] rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-polka-purple/[0.03] rounded-full blur-[80px]" />
+          <div className="relative">
+            <p className="tech-label text-polka-text/80 mb-2">Cross-Chain Overview</p>
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <p className="num-display text-3xl text-white">{opportunities.length}</p>
+                <p className="font-mono text-[9px] text-polka-text/60 uppercase tracking-wider mt-1">Opportunities</p>
+              </div>
+              <div>
+                <p className="num-display text-3xl text-emerald-400">
+                  {totalProfit > 0 ? `+$${totalProfit.toFixed(0)}` : "$0"}
+                </p>
+                <p className="font-mono text-[9px] text-polka-text/60 uppercase tracking-wider mt-1">Total Est. Profit</p>
+              </div>
+              <div>
+                <p className="num-display text-3xl text-polka-pink">
+                  {bestSpread > 0 ? `${bestSpread.toFixed(1)}%` : "0%"}
+                </p>
+                <p className="font-mono text-[9px] text-polka-text/60 uppercase tracking-wider mt-1">Best Spread</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2 font-mono text-[10px] text-polka-text/70 uppercase tracking-wider">
+                <Activity size={12} />
+                <span>Scanning {chainCount} parachains</span>
+              </div>
+              <div className="flex items-center gap-2 font-mono text-[10px] text-emerald-400/70 uppercase tracking-wider">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Live</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Opportunities */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-sm font-semibold text-white tracking-wide flex items-center gap-2">
-              <Zap size={14} className="text-amber-400" /> Arbitrage Opportunities ({opportunities.length})
-            </h2>
-          </div>
+          <h2 className="tech-label text-polka-text/80 flex items-center gap-2 mb-4">
+            <Zap size={12} className="text-amber-400" /> Arbitrage Opportunities ({opportunities.length})
+          </h2>
 
           {opportunities.length > 0 ? (
             <div className="space-y-3">
               {opportunities.map((opp, i) => (
-                <div key={i} className="p-5 rounded-xl tech-card corner-accents">
+                <div key={i} className={`p-5 rounded-xl border ${opp.spread_pct >= 100 ? "border-emerald-500/15 bg-emerald-500/[0.02]" : opp.spread_pct >= 10 ? "border-amber-500/15 bg-amber-500/[0.02]" : "tech-card"} corner-accents`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold shadow-lg">
+                      <div className={`w-10 h-10 rounded-md border ${CHAIN_BORDER_COLORS[opp.buy_chain] || "border-polka-border bg-polka-darker"} flex items-center justify-center font-mono text-sm font-bold text-white`}>
                         {opp.token[0]}
                       </div>
                       <div>
-                        <h3 className="font-display text-[15px] font-semibold text-white">{opp.token}</h3>
-                        <p className="font-mono text-[9px] text-polka-text/70 uppercase tracking-[0.2em]">{opp.spread_pct}% spread</p>
+                        <h3 className="font-display text-[15px] font-semibold text-white tracking-wide">{opp.token}</h3>
+                        <p className="font-mono text-[9px] text-polka-text/70 uppercase tracking-[0.2em]">{opp.spread_pct.toFixed(2)}% spread</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="num-display text-[18px] font-bold text-emerald-400">+${opp.estimated_profit_usd}</p>
+                      <p className="num-display text-[18px] font-bold text-emerald-400">+${opp.estimated_profit_usd.toFixed(2)}</p>
                       <p className="font-mono text-[8px] text-polka-text/50 uppercase tracking-wider">est. profit</p>
                     </div>
                   </div>
@@ -154,27 +204,27 @@ export default function XCMPage() {
                     <div className="p-2.5 rounded-lg bg-polka-darker border border-polka-border">
                       <p className="font-mono text-[8px] text-polka-text/60 uppercase tracking-[0.2em]">Trade Size</p>
                       <p className="font-mono text-[12px] text-white font-medium mt-1">${opp.trade_size_usd.toLocaleString()}</p>
-                      <p className="font-mono text-[11px] text-emerald-400 tracking-wider">+{opp.spread_pct}%</p>
+                      <p className="font-mono text-[11px] text-emerald-400 tracking-wider">+{opp.spread_pct.toFixed(2)}%</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 rounded-xl tech-card">
-              <Globe size={32} className="mx-auto text-polka-text/20 mb-3" />
-              <p className="font-display text-polka-text/50 text-[13px]">No significant cross-chain arbitrage right now</p>
-              <p className="font-mono text-[9px] text-polka-text/30 mt-1 uppercase tracking-[0.2em]">Scanning 6 parachains every 15 seconds</p>
+            <div className="text-center py-16">
+              <Globe size={40} className="mx-auto text-polka-text/30 mb-4" />
+              <h3 className="font-display text-white font-semibold mb-2 tracking-wide">No Arbitrage Opportunities</h3>
+              <p className="font-mono text-polka-text/70 text-[10px] uppercase tracking-wider mb-4">Scanning {chainCount} parachains every 15 seconds</p>
             </div>
           )}
         </div>
 
         {/* Cross-Chain Prices Grid */}
         <div>
-          <h2 className="font-display text-sm font-semibold text-white tracking-wide mb-4 flex items-center gap-2">
-            <Globe size={14} className="text-polka-pink" /> Cross-Chain Prices
+          <h2 className="tech-label text-polka-text/80 flex items-center gap-2 mb-4">
+            <BarChart3 size={12} className="text-polka-pink" /> Cross-Chain Prices
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {Object.entries(prices).map(([chain, info]: [string, any]) => (
               <div key={chain} className="p-5 rounded-xl tech-card corner-accents">
                 <div className="flex items-center gap-2 mb-3">
@@ -188,9 +238,9 @@ export default function XCMPage() {
                 </div>
                 <div className="space-y-1.5">
                   {Object.entries(info.tokens || {}).map(([token, data]: [string, any]) => (
-                    <div key={token} className="flex justify-between text-[11px]">
-                      <span className="font-mono text-polka-text/60 uppercase tracking-wider">{token}</span>
-                      <span className="text-white font-mono tracking-wider">${data.price_usd?.toFixed(4)}</span>
+                    <div key={token} className="flex justify-between items-center p-1.5 rounded-lg hover:bg-polka-pink/[0.02] transition-all">
+                      <span className="font-mono text-[11px] text-polka-text/60 uppercase tracking-wider">{token}</span>
+                      <span className="text-white font-mono text-[11px] tracking-wider">${data.price_usd?.toFixed(4)}</span>
                     </div>
                   ))}
                 </div>
