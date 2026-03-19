@@ -1,8 +1,16 @@
-from pydantic_settings import BaseSettings
+import os
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
     deepseek_api_key: str = ""
     agent_private_key: str = ""
     rpc_url: str = "https://eth-rpc-testnet.polkadot.io/"
@@ -21,13 +29,17 @@ class Settings(BaseSettings):
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
 
-    class Config:
-        env_file = ".env"
-
 
 @lru_cache()
 def get_settings():
-    return Settings()
+    s = Settings()
+    # Log what we got (helps debug Railway)
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"Config loaded: wallet_factory={s.wallet_factory_address[:10] if s.wallet_factory_address else 'EMPTY'}...")
+    logger.info(f"Config loaded: router={s.router_address[:10] if s.router_address else 'EMPTY'}...")
+    logger.info(f"Config loaded: rpc={s.rpc_url}")
+    return s
 
 
 # Token metadata

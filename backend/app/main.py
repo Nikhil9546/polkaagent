@@ -43,3 +43,20 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.get("/debug/config")
+async def debug_config():
+    from .config import get_settings
+    s = get_settings()
+    return {
+        "wallet_factory": s.wallet_factory_address[:10] + "..." if s.wallet_factory_address else "NOT SET",
+        "router": s.router_address[:10] + "..." if s.router_address else "NOT SET",
+        "wpas": s.wpas_address[:10] + "..." if s.wpas_address else "NOT SET",
+        "usdt": s.usdt_address[:10] + "..." if s.usdt_address else "NOT SET",
+        "usdc": s.usdc_address[:10] + "..." if s.usdc_address else "NOT SET",
+        "rpc": s.rpc_url,
+        "chain_id": s.chain_id,
+        "has_deepseek": bool(s.deepseek_api_key),
+        "has_agent_key": bool(s.agent_private_key),
+    }
