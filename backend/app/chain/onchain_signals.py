@@ -9,14 +9,17 @@ This is architecturally unique to Polkadot because:
 import logging
 from web3 import Web3
 from ..config import get_settings
-from .client import w3
+from .client import w3, load_abi
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
+# Load ABI from backend/abi/ (works on Railway)
+_SIGNAL_CLASSIFIER_ABI_LOADED = load_abi("SignalClassifier")
+
 SIGNAL_CLASSIFIER_ADDRESS = "0xA13d5b9A1676a9f630A593B1f45A369765622934"
 
-SIGNAL_CLASSIFIER_ABI = [
+SIGNAL_CLASSIFIER_ABI = _SIGNAL_CLASSIFIER_ABI_LOADED if _SIGNAL_CLASSIFIER_ABI_LOADED else [
     {"inputs": [{"name": "pair", "type": "address"}], "name": "analyzePair", "outputs": [{"components": [{"name": "signalType", "type": "uint8"}, {"name": "strength", "type": "uint8"}, {"name": "score", "type": "uint256"}, {"name": "timestamp", "type": "uint256"}], "name": "", "type": "tuple"}], "stateMutability": "nonpayable", "type": "function"},
     {"inputs": [{"name": "pairs", "type": "address[]"}], "name": "analyzeMultiplePairs", "outputs": [{"components": [{"name": "signalType", "type": "uint8"}, {"name": "strength", "type": "uint8"}, {"name": "score", "type": "uint256"}, {"name": "timestamp", "type": "uint256"}], "name": "", "type": "tuple[]"}], "stateMutability": "nonpayable", "type": "function"},
     {"inputs": [{"name": "pair", "type": "address"}], "name": "getLatestSignal", "outputs": [{"components": [{"name": "signalType", "type": "uint8"}, {"name": "strength", "type": "uint8"}, {"name": "score", "type": "uint256"}, {"name": "timestamp", "type": "uint256"}], "name": "", "type": "tuple"}], "stateMutability": "view", "type": "function"},
