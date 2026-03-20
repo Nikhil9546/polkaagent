@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 from ..chain.signals import get_all_prices, generate_signals
 from ..chain.executor import execute_swap_autonomous
 from ..chain.reader import get_agent_wallet_address, get_agent_wallet_balances
+from ..chain.onchain_signals import run_onchain_analysis, read_onchain_signals
 from ..ai.engine import DeepSeekEngine
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,26 @@ async def get_signals():
 async def get_prices():
     """Get current token prices from DEX."""
     return get_all_prices()
+
+
+@router.post("/signals/onchain")
+async def onchain_analysis():
+    """Run signal classification ON-CHAIN via SignalClassifier contract.
+    This computation happens inside Polkadot Hub's execution environment."""
+    try:
+        return run_onchain_analysis()
+    except Exception as e:
+        logger.error(f"On-chain signal error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/signals/onchain")
+async def read_onchain():
+    """Read latest on-chain signals without triggering new analysis."""
+    try:
+        return read_onchain_signals()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/signals/auto-trade")

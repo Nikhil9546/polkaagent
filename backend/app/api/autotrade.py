@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from ..chain.signals import generate_signals, get_all_prices
 from ..chain.executor import execute_swap_autonomous
 from ..chain.reader import get_agent_wallet_address, get_agent_wallet_balances
+from ..chain.onchain_signals import run_onchain_analysis
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -99,25 +100,50 @@ async def run_once(wallet_address: str):
 
 
 def _execute_cycle(wallet_address: str) -> dict:
-    """Execute one auto-trade cycle."""
+    """Execute one auto-trade cycle with hybrid on-chain + off-chain signals."""
     state = get_state(wallet_address)
     state["last_run"] = int(time.time())
 
+    # Step 1: Run ON-CHAIN signal classification via SignalClassifier contract
+    onchain_result = None
+    try:
+        onchain_result = run_onchain_analysis()
+        logger.info(f"On-chain signals: {onchain_result.get('results', {}).keys()}")
+    except Exception as e:
+        logger.warning(f"On-chain analysis failed (continuing with off-chain): {e}")
+
+    # Step 2: Get OFF-CHAIN signals (pool analysis in Python)
     signals = generate_signals()
     prices = get_all_prices()
 
-    # Filter by strength
+    # Step 3: Merge signals — on-chain signals boost confidence
     valid_strengths = ["STRONG"] if state["min_signal_strength"] == "STRONG" else ["STRONG", "MODERATE"]
     buy_signals = [
         s for s in signals
         if s["signal_type"] == "BUY" and s["strength"] in valid_strengths
     ]
 
+    # Boost: if on-chain classifier also says BUY, elevate to STRONG
+    if onchain_result:
+        for pair_name, data in onchain_result.get("results", {}).items():
+            if isinstance(data, dict) and data.get("signal_type") == "BUY" and data.get("computed_on_chain"):
+                # On-chain agrees — add or boost signal
+                token = pair_name.split("/")[-1] if "/" in pair_name else ""
+                existing = [s for s in buy_signals if s.get("token") == token]
+                if not existing and token:
+                    buy_signals.append({
+                        "signal_type": "BUY",
+                        "token": token,
+                        "strength": "STRONG",
+                        "reason": f"On-chain SignalClassifier: BUY {token} (score={data.get('score', 0)})",
+                    })
+
     if not buy_signals:
         return {
             "action": "HOLD",
-            "reason": "No strong enough buy signals",
+            "reason": "No strong enough buy signals (on-chain + off-chain)",
             "signals_checked": len(signals),
+            "onchain_analysis": onchain_result is not None,
             "prices": prices,
         }
 
@@ -170,6 +196,8 @@ def _execute_cycle(wallet_address: str) -> dict:
         "trade": trade_record,
         "portfolio_before": balances,
         "signals_checked": len(signals),
+        "onchain_classifier_used": onchain_result is not None,
+        "signal_source": "hybrid (on-chain + off-chain)" if onchain_result else "off-chain only",
     }
 
 
